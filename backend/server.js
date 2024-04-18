@@ -1,23 +1,34 @@
-// configuring .env
+// Importing necessary modules/packages
+import express from "express";
+import connectDb from "./db/connectDb.js";
 import { config } from "dotenv";
+
+// Configuring .env
 config();
 
-// importing needful modules
-import express from "express";
-import mongoose from "mongoose";
+// Connect to the database
+connectDb();
 
+// Initialize Express
 const app = express();
 
-// defining port for server to listen
+// Define port for the server to listen on
 const PORT = process.env.PORT || 4000;
 
-// Connecting to DB
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(console.log("Db connected"))
-  .catch("Error occured while establishing connect with DB");
+// Middleware to handle JSON parsing
+app.use(express.json());
 
-// Make server listen 
-app.listen(PORT, (req, res) => {
-  console.log(`Server listening on port ${PORT}`);
+// Login Route
+app.get("/login", (req, res) => {
+  res.send("Login Page");
+});
+
+// Register Route
+app.get("/register", (req, res) => {
+  res.send("Register Page");
+});
+
+// Make the server listen
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
