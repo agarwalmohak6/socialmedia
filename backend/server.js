@@ -2,6 +2,8 @@
 import express from "express";
 import connectDb from "./db/connectDb.js";
 import { config } from "dotenv";
+import cookieParser from "cookie-parser";
+import userRoutes from "./routes/UserRoutes.js";
 
 // Configuring .env
 config();
@@ -15,18 +17,12 @@ const app = express();
 // Define port for the server to listen on
 const PORT = process.env.PORT || 4000;
 
-// Middleware to handle JSON parsing
-app.use(express.json());
+// Middlewares -> that runs between request and response
+app.use(express.json()); // to handle JSON parsing
+app.use(cookieParser()); // to get cookies from req and set cookie in res
 
-// Login Route
-app.get("/login", (req, res) => {
-  res.send("Login Page");
-});
-
-// Register Route
-app.get("/register", (req, res) => {
-  res.send("Register Page");
-});
+// Routes
+app.use("/api/users", userRoutes);
 
 // Make the server listen
 app.listen(PORT, () => {
