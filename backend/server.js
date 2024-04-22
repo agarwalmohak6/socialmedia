@@ -19,6 +19,7 @@ const PORT = process.env.PORT || 4000;
 
 // Middlewares -> that runs between request and response
 app.use(express.json()); // to handle JSON parsing
+app.use(express.urlencoded({ extended: true })); // to handle JSON parsing
 app.use(cookieParser()); // to get cookies from req and set cookie in res
 
 // Routes
