@@ -85,7 +85,7 @@ const followUnfollowUser = async (req, res) => {
     }
 
     const isFollowing = currentUser.following.includes(userToModify._id);
-    console.log(isFollowing);
+
     if (isFollowing) {
       // Unfollow
       await User.findByIdAndUpdate(userToModify._id, {
