@@ -1,6 +1,6 @@
 import User from "../models/User.model.js";
 import jwt from "jsonwebtoken";
-// Checking if user is logged in to follow / unfollow
+// Checking if user is logged in to do actions
 const protectRoute = async (req, res, next) => {
   try {
     const token = req.cookies.token;
