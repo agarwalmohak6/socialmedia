@@ -4,6 +4,7 @@ import connectDb from "./db/connectDb.js";
 import { config } from "dotenv";
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/UserRoutes.js";
+import postRoutes from "./routes/PostRoutes.js"
 
 // Configuring .env
 config();
@@ -24,6 +25,7 @@ app.use(cookieParser()); // to get cookies from req and set cookie in res
 
 // Routes
 app.use("/api/users", userRoutes);
+app.use("/api/posts",postRoutes);
 
 // Make the server listen
 app.listen(PORT, () => {

@@ -116,6 +116,11 @@ const updateUser = async (req, res) => {
   const userId = req.user._id;
   try {
     let user = await User.findById(userId);
+    if (req.params.id !== userId.toString()) {
+      return res
+        .status(400)
+        .json({ message: "You cannot update other user's profile" });
+    }
     if (password) {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
@@ -135,4 +140,27 @@ const updateUser = async (req, res) => {
   }
 };
 
-export { signUpUser, loginUser, logoutUser, followUnfollowUser, updateUser };
+const getUserProfile = async (req, res) => {
+  const { username } = req.params;
+  try {
+    let user = await User.findOne({ username })
+      .select("-password")
+      .select("-updatedAt");
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+    return res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+    console.log("Error in userProfile", error.message);
+  }
+};
+
+export {
+  signUpUser,
+  loginUser,
+  logoutUser,
+  followUnfollowUser,
+  updateUser,
+  getUserProfile,
+};
