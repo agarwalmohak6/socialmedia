@@ -1,6 +1,7 @@
 import User from "../models/User.model.js";
 import bcrypt from "bcryptjs";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAndSetCookie.js";
+import mongoose from "mongoose";
 
 const signUpUser = async (req, res) => {
   try {
@@ -156,6 +157,26 @@ const getUserProfile = async (req, res) => {
   }
 };
 
+const getFriends = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+    const friendIds = [...user.followers, ...user.following];
+    const friends = await User.find({ _id: { $in: friendIds } });
+    const friendNames = friends.map((friend) => ({
+      username: friend.username,
+      name: friend.name,
+    }));
+    return res.status(200).json({ friends: friendNames });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+    console.log("Error in getFriends", error.message);
+  }
+};
+
 export {
   signUpUser,
   loginUser,
@@ -163,4 +184,5 @@ export {
   followUnfollowUser,
   updateUser,
   getUserProfile,
+  getFriends,
 };

@@ -44,4 +44,45 @@ const getPost = async (req, res) => {
   }
 };
 
-export { createPost, getPost };
+const deletePost = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const post = await Post.findById(id);
+    const userId = req.user._id;
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    if (post.postedBy.toString() !== userId.toString()) {
+      return res.status(401).json({ message: "Unauthorized to delete post" });
+    }
+    await Post.findByIdAndDelete(id);
+    res.status(200).json({ message: "Post deleted successfully" });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+    console.log("Error in deletePost", error.message);
+  }
+};
+
+const likeUnlikePost = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const post = await Post.findById(id);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    if (post.likes.includes(req.user._id)) {
+      await Post.updateOne({ id }, { $pull: { likes: req.user._id } });
+      return res.status(201).json({ message: "Post unliked successfully" });
+    } else {
+      post.likes.push(req.user._id);
+      await post.save();
+      return res.status(201).json({ message: "Post liked successfully" });
+    }
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+    console.log("Error in likePost", error.message);
+  }
+};
+
+export { createPost, getPost, deletePost, likeUnlikePost };
