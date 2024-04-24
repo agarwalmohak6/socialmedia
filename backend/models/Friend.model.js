@@ -18,3 +18,5 @@ const friendSchema = mongoose.Schema({
     default: PENDING,
   },
 });
+
+export default friendSchema;
