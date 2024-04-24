@@ -4,6 +4,7 @@ import protectRoute from "../middlewares/protectRoute.js";
 import {
   createPost,
   deletePost,
+  deleteReplyToPost,
   getPost,
   likeUnlikePost,
   replyToPost
@@ -14,5 +15,6 @@ router.get("/:id", getPost);
 router.delete("/:id", protectRoute, deletePost);
 router.post("/like/:id",protectRoute, likeUnlikePost);
 router.post("/reply/:id",protectRoute, replyToPost);
+router.delete("/deleteReply/:id1/:id2",protectRoute, deleteReplyToPost);
 
 export default router;

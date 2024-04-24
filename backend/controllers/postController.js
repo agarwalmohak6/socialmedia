@@ -147,12 +147,17 @@ const deleteReplyToPost = async (req, res) => {
         .status(StatusCodes.NOT_FOUND)
         .json({ message: "Post not found" });
     }
-    const reply = await post.findById(replyId);
-    if (!reply) {
+    const replyIndex = post.replies.findIndex(
+      (reply) => reply._id.toString() === replyId
+    );
+    if (replyIndex === -1) {
       return res
         .status(StatusCodes.NOT_FOUND)
         .json({ message: "Reply not found" });
     }
+    post.replies.splice(replyIndex, 1);
+    await post.save();
+    res.status(StatusCodes.OK).json({ message: "Reply deleted successfully" });
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
     console.log("Error in deleteReplyTopost", error.message);
