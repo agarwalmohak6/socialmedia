@@ -159,7 +159,7 @@ const deleteReplyToPost = async (req, res) => {
     await post.save();
     res.status(StatusCodes.OK).json({ message: "Reply deleted successfully" });
   } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
+    res.status(StatusCodes.NO_CONTENT).json({ message: error.message });
     console.log("Error in deleteReplyTopost", error.message);
   }
 };
