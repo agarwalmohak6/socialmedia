@@ -1,4 +1,5 @@
 import User from "../models/User.model.js";
+import Friend from "../models/Friend.model.js";
 import bcrypt from "bcryptjs";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAndSetCookie.js";
 import StatusCodes from "../utils/statusCodes.js";
@@ -88,40 +89,31 @@ const followUnfollowUser = async (req, res) => {
     const { id } = req.params;
     const userToModify = await User.findById(id); // user to follow or unfollow
     const currentUser = await User.findById(req.user._id); // logged in user
-
     if (!userToModify || !currentUser) {
       return res
         .status(StatusCodes.NOT_FOUND)
         .json({ message: "User not found" });
     }
-
     if (userToModify._id.equals(currentUser._id)) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "You can't follow / unfollow yourself" });
     }
-
-    const isFollowing = currentUser.following.includes(userToModify._id);
-
-    if (isFollowing) {
-      // Unfollow
-      await User.findByIdAndUpdate(userToModify._id, {
-        $pull: { followers: currentUser._id },
-      });
-      await User.findByIdAndUpdate(currentUser._id, {
-        $pull: { following: userToModify._id },
-      });
+    const existingFriendship = await Friend.findOne({
+      followRequestBy: currentUser._id,
+      followRequestTo: userToModify._id,
+    });
+    if (existingFriendship) {
+      await Friend.deleteOne(existingFriendship); // Fix: Use deleteOne instead of remove
       res
         .status(StatusCodes.OK)
         .json({ message: "User unfollowed successfully" });
     } else {
-      // Follow
-      await User.findByIdAndUpdate(userToModify._id, {
-        $push: { followers: currentUser._id },
+      const newFriendship = new Friend({
+        followRequestBy: currentUser._id,
+        followRequestTo: userToModify._id,
       });
-      await User.findByIdAndUpdate(currentUser._id, {
-        $push: { following: userToModify._id },
-      });
+      await newFriendship.save();
       res
         .status(StatusCodes.OK)
         .json({ message: "User followed successfully" });
@@ -133,6 +125,7 @@ const followUnfollowUser = async (req, res) => {
     console.log("Error while following/unfollowing user:", error.message);
   }
 };
+
 
 const updateUser = async (req, res) => {
   const { name, username, email, password, profilePic, bio } = req.body;
@@ -186,13 +179,16 @@ const getUserProfile = async (req, res) => {
 const getFriends = async (req, res) => {
   const { id } = req.params;
   try {
-    const user = await User.findById(id);
-    if (!user) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ message: "User not found" });
-    }
-    const friendIds = [...user.followers, ...user.following];
+    const friendRequests = await Friend.find({
+      $or: [{ followRequestBy: id }, { followRequestTo: id }],
+    });
+    const friendIds = friendRequests.map((friendRequest) => {
+      if (friendRequest.followRequestBy.toString() === id) {
+        return friendRequest.followRequestTo;
+      } else {
+        return friendRequest.followRequestBy;
+      }
+    });
     const friends = await User.find({ _id: { $in: friendIds } });
     const friendNames = friends.map((friend) => ({
       username: friend.username,
