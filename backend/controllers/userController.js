@@ -1,14 +1,16 @@
 import User from "../models/User.model.js";
 import bcrypt from "bcryptjs";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAndSetCookie.js";
-import mongoose from "mongoose";
+import StatusCodes from "../utils/statusCodes.js";
 
 const signUpUser = async (req, res) => {
   try {
     const { name, username, email, password } = req.body;
     const user = await User.findOne({ email } || { username });
     if (user) {
-      return res.status(400).json({ message: "User already exists" });
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "User already exists" });
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -23,17 +25,21 @@ const signUpUser = async (req, res) => {
 
     if (newUser) {
       generateTokenAndSetCookie(newUser._id, res);
-      res.status(201).json({
+      res.status(StatusCodes.CREATED).json({
         _id: newUser._id,
         name: newUser.name,
         email: newUser.email,
         username: newUser.username,
       });
     } else {
-      res.status(400).json({ message: "Invalid user data" });
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "Invalid user data" });
     }
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: err.message });
     console.log("Error in signUpUser: ", err.message);
   }
 };
@@ -44,17 +50,21 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ username });
     const isPassCorrect = await bcrypt.compare(password, user?.password || "");
     if (!user || !isPassCorrect) {
-      return res.status(400).json({ message: "Invalid login credentials" });
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "Invalid login credentials" });
     }
     generateTokenAndSetCookie(user._id, res);
-    res.status(200).json({
+    res.status(StatusCodes.OK).json({
       _id: user._id,
       name: user.name,
       email: user.email,
       username: user.username,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: error.message });
     console.log("Error in login user", error.message);
   }
 };
@@ -62,9 +72,13 @@ const loginUser = async (req, res) => {
 const logoutUser = async (req, res) => {
   try {
     res.cookie("token", "", { maxAge: 1 });
-    res.status(200).json({ message: "User logged out successfully" });
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "User logged out successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: error.message });
     console.log("Error while logout", error.message);
   }
 };
@@ -76,12 +90,14 @@ const followUnfollowUser = async (req, res) => {
     const currentUser = await User.findById(req.user._id); // logged in user
 
     if (!userToModify || !currentUser) {
-      return res.status(400).json({ message: "User not found" });
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: "User not found" });
     }
 
     if (userToModify._id.equals(currentUser._id)) {
       return res
-        .status(400)
+        .status(StatusCodes.BAD_REQUEST)
         .json({ message: "You can't follow / unfollow yourself" });
     }
 
@@ -95,7 +111,9 @@ const followUnfollowUser = async (req, res) => {
       await User.findByIdAndUpdate(currentUser._id, {
         $pull: { following: userToModify._id },
       });
-      res.status(200).json({ message: "User unfollowed successfully" });
+      res
+        .status(StatusCodes.OK)
+        .json({ message: "User unfollowed successfully" });
     } else {
       // Follow
       await User.findByIdAndUpdate(userToModify._id, {
@@ -104,10 +122,14 @@ const followUnfollowUser = async (req, res) => {
       await User.findByIdAndUpdate(currentUser._id, {
         $push: { following: userToModify._id },
       });
-      res.status(200).json({ message: "User followed successfully" });
+      res
+        .status(StatusCodes.OK)
+        .json({ message: "User followed successfully" });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: error.message });
     console.log("Error while following/unfollowing user:", error.message);
   }
 };
@@ -119,7 +141,7 @@ const updateUser = async (req, res) => {
     let user = await User.findById(userId);
     if (req.params.id !== userId.toString()) {
       return res
-        .status(400)
+        .status(StatusCodes.UNAUTHORIZED)
         .json({ message: "You cannot update other user's profile" });
     }
     if (password) {
@@ -134,9 +156,11 @@ const updateUser = async (req, res) => {
     user.bio = bio || user.bio;
 
     user = await user.save();
-    res.status(200).json({ message: "Profile updated successfully", user });
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "Profile updated successfully", user });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
     console.log("Error in update user:", error.message);
   }
 };
@@ -148,11 +172,13 @@ const getUserProfile = async (req, res) => {
       .select("-password")
       .select("-updatedAt");
     if (!user) {
-      return res.status(400).json({ message: "User not found" });
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: "User not found" });
     }
-    return res.status(200).json(user);
+    return res.status(StatusCodes.OK).json(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
     console.log("Error in userProfile", error.message);
   }
 };
@@ -162,7 +188,9 @@ const getFriends = async (req, res) => {
   try {
     const user = await User.findById(id);
     if (!user) {
-      return res.status(400).json({ message: "User not found" });
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: "User not found" });
     }
     const friendIds = [...user.followers, ...user.following];
     const friends = await User.find({ _id: { $in: friendIds } });
@@ -170,9 +198,9 @@ const getFriends = async (req, res) => {
       username: friend.username,
       name: friend.name,
     }));
-    return res.status(200).json({ friends: friendNames });
+    return res.status(StatusCodes.OK).json({ friends: friendNames });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
     console.log("Error in getFriends", error.message);
   }
 };
