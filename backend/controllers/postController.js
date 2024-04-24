@@ -70,7 +70,7 @@ const deletePost = async (req, res) => {
     }
     await Post.findByIdAndDelete(id);
     res
-      .status(StatusCodes.CREATED)
+      .status(StatusCodes.NO_CONTENT)
       .json({ message: "Post deleted successfully" });
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
