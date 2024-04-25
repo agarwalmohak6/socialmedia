@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -15,13 +18,15 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Send form data to the backend API endpoint
       const response = await axios.post(
         "http://localhost:5000/api/users/login",
         formData
       );
-      console.log(response.data); // Log response from the server
-      // Optionally, you can redirect the user after successful login
+      if (response.status === 200) {
+        navigate(`/${response.data.username}`);
+      } else if (response.status === 400) {
+        alert("Invalid credentials");
+      }
     } catch (error) {
       console.error(error); // Handle error
     }
