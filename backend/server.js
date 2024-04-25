@@ -4,7 +4,8 @@ import connectDb from "./db/connectDb.js";
 import { config } from "dotenv";
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/UserRoutes.js";
-import postRoutes from "./routes/PostRoutes.js"
+import postRoutes from "./routes/PostRoutes.js";
+import cors from "cors";
 
 // Configuring .env
 config();
@@ -22,10 +23,11 @@ const PORT = process.env.PORT || 4000;
 app.use(express.json()); // to handle JSON parsing
 app.use(express.urlencoded({ extended: true })); // to handle JSON parsing
 app.use(cookieParser()); // to get cookies from req and set cookie in res
+app.use(cors());
 
 // Routes
 app.use("/api/users", userRoutes);
-app.use("/api/posts",postRoutes);
+app.use("/api/posts", postRoutes);
 
 // Make the server listen
 app.listen(PORT, () => {
