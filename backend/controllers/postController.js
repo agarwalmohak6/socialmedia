@@ -13,7 +13,7 @@ const createPost = async (req, res) => {
     const user = await User.findById(postedBy);
     if (!user) {
       return res
-        .status(StatusCodes.BAD_REQUEST)
+        .status(StatusCodes.NOT_FOUND)
         .json({ message: "User not found" });
     }
     if (user._id.toString() !== req.user._id.toString()) {
