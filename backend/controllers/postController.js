@@ -1,6 +1,8 @@
 import Post from "../models/Post.model.js";
 import User from "../models/User.model.js";
 import StatusCodes from "../utils/statusCodes.js";
+import checkPostExist from "../utils/helpers/checkPostExist.js";
+import checkUserExist from "../utils/helpers/checkUserExist.js";
 
 const createPost = async (req, res) => {
   try {
@@ -11,11 +13,7 @@ const createPost = async (req, res) => {
         .json({ message: "PostedBy and text fields are mandatory" });
     }
     const user = await User.findById(postedBy);
-    if (!user) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ message: "User not found" });
-    }
+    checkUserExist(user);
     if (user._id.toString() !== req.user._id.toString()) {
       return res
         .status(StatusCodes.UNAUTHORIZED)
@@ -41,12 +39,8 @@ const getPost = async (req, res) => {
   const { id } = req.params;
   try {
     const post = await Post.findById(id);
-    if (!post) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ message: "Post not found" });
-    }
-    return res.status(StatusCodes.CREATED).json(post);
+    checkPostExist(post);
+    return res.status(StatusCodes.OK).json(post);
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
     console.log("Error in getPost", error.message);
@@ -58,11 +52,7 @@ const deletePost = async (req, res) => {
   try {
     const post = await Post.findById(id);
     const userId = req.user._id;
-    if (!post) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ message: "Post not found" });
-    }
+    checkPostExist(post);
     if (post.postedBy.toString() !== userId.toString()) {
       return res
         .status(StatusCodes.UNAUTHORIZED)
@@ -82,12 +72,7 @@ const likeUnlikePost = async (req, res) => {
   const { id } = req.params;
   try {
     const post = await Post.findById(id);
-    if (!post) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ message: "Post not found" });
-    }
-
+    checkPostExist(post);
     if (post.likes.includes(req.user._id)) {
       await Post.updateOne({ id }, { $pull: { likes: req.user._id } });
       return res
@@ -120,11 +105,7 @@ const replyToPost = async (req, res) => {
         .json({ message: "Text is required to post" });
     }
     const post = await Post.findById(postId);
-    if (!post) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ message: "Post does not exist" });
-    }
+    checkPostExist(post);
     const reply = { userId, text, userProfilePic, username };
     post.replies.push(reply);
     await post.save();
@@ -142,11 +123,7 @@ const deleteReplyToPost = async (req, res) => {
     const postId = req.params.id1;
     const replyId = req.params.id2;
     const post = await Post.findById(postId);
-    if (!post) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ message: "Post not found" });
-    }
+    checkPostExist(post);
     const replyIndex = post.replies.findIndex(
       (reply) => reply._id.toString() === replyId
     );
