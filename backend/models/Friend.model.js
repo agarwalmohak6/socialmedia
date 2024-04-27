@@ -1,20 +1,20 @@
 import mongoose from "mongoose";
-import { PENDING, ACCEPTED, REJECTED } from "../utils/constants.js";
 
-const friendSchema = mongoose.Schema({
-  followRequestBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+const friendSchema = mongoose.Schema(
+  {
+    followRequestBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    followRequestTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
-  followRequestTo: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  status: {
-    type: String,
-    enum: [PENDING, ACCEPTED, REJECTED],
-    default: PENDING,
-  },
-});
+  { timestamps: true }
+);
+
+const Friend = mongoose.model("Friend", friendSchema);
+export default Friend;
