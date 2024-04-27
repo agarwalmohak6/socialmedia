@@ -1,5 +1,6 @@
 import Post from "../models/Post.model.js";
 import User from "../models/User.model.js";
+import Reply from "../models/Reply.model.js";
 import StatusCodes from "../utils/statusCodes.js";
 import checkPostExist from "../utils/helpers/checkPostExist.js";
 import checkUserExist from "../utils/helpers/checkUserExist.js";
@@ -80,7 +81,7 @@ const likeUnlikePost = async (req, res) => {
         .json({ message: "Post unliked successfully" });
     } else {
       post.likes.push(req.user._id);
-      await Post.save();
+      await post.save();
       return res
         .status(StatusCodes.CREATED)
         .json({ message: "Post liked successfully" });
@@ -96,19 +97,19 @@ const replyToPost = async (req, res) => {
     const postId = req.params.id;
     const { text } = req.body;
     const userId = req.user._id;
-    const userProfilePic = req.user.profilePic;
-    const username = req.user.username;
 
     if (!text) {
       return res
         .status(StatusCodes.NO_CONTENT)
         .json({ message: "Text is required to post" });
     }
+
     const post = await Post.findById(postId);
     checkPostExist(post);
-    const reply = { userId, text, userProfilePic, username };
-    post.replies.push(reply);
-    await post.save();
+
+    const reply = new Reply({ userId, text });
+    await reply.save();
+
     res
       .status(StatusCodes.CREATED)
       .json({ message: "Reply added successfully", post });
@@ -122,18 +123,16 @@ const deleteReplyToPost = async (req, res) => {
   try {
     const postId = req.params.id1;
     const replyId = req.params.id2;
+
     const post = await Post.findById(postId);
     checkPostExist(post);
-    const replyIndex = post.replies.findIndex(
-      (reply) => reply._id.toString() === replyId
-    );
-    if (replyIndex === -1) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ message: "Reply not found" });
+
+    const reply= await Reply.findById(replyId);
+    if(!reply){
+      return res.status(StatusCodes.NOT_FOUND).json({message: "Reply not found"})
     }
-    post.replies.splice(replyIndex, 1);
-    await post.save();
+    await Reply.findByIdAndDelete(replyId);
+
     res.status(StatusCodes.OK).json({ message: "Reply deleted successfully" });
   } catch (error) {
     res.status(StatusCodes.NO_CONTENT).json({ message: error.message });
