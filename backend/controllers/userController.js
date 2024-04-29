@@ -1,11 +1,15 @@
 import User from "../models/User.model.js";
+import { validateUser } from "../models/User.model.js";
 import Friend from "../models/Friend.model.js";
+import { validateFriend } from "../models/Friend.model.js";
 import bcrypt from "bcryptjs";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAndSetCookie.js";
 import StatusCodes from "../utils/statusCodes.js";
+import checkUserExist from "../utils/helpers/checkUserExist.js";
 
 const signUpUser = async (req, res) => {
   try {
+    await validateUser(req.body);
     const { name, username, email, password } = req.body;
     const user = await User.findOne({ email } || { username });
     if (user) {
@@ -47,6 +51,7 @@ const signUpUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   try {
+    await validateUser(req.body);
     const { username, password } = req.body;
     const user = await User.findOne({ username });
     const isPassCorrect = await bcrypt.compare(password, user?.password || "");
@@ -87,13 +92,11 @@ const logoutUser = async (req, res) => {
 const followUnfollowUser = async (req, res) => {
   try {
     const { id } = req.params;
+    await validateFriend(req.body);
     const userToModify = await User.findById(id); // user to follow or unfollow
     const currentUser = await User.findById(req.user._id); // logged in user
-    if (!userToModify || !currentUser) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ message: "User not found" });
-    }
+    checkUserExist(userToModify);
+    checkUserExist(currentUser);
     if (userToModify._id.equals(currentUser._id)) {
       return res
         .status(StatusCodes.BAD_REQUEST)
@@ -125,7 +128,6 @@ const followUnfollowUser = async (req, res) => {
     console.log("Error while following/unfollowing user:", error.message);
   }
 };
-
 
 const updateUser = async (req, res) => {
   const { name, username, email, password, profilePic, bio } = req.body;
@@ -164,11 +166,7 @@ const getUserProfile = async (req, res) => {
     let user = await User.findOne({ username })
       .select("-password")
       .select("-updatedAt");
-    if (!user) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ message: "User not found" });
-    }
+    checkUserExist(user);
     return res.status(StatusCodes.OK).json(user);
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });

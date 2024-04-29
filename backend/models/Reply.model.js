@@ -1,9 +1,11 @@
 import mongoose from "mongoose";
+import * as Yup from "yup";
+
 const replySchema = mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Reference to the user model
+      ref: "User",
       required: true,
     },
     text: {
@@ -15,4 +17,14 @@ const replySchema = mongoose.Schema(
 );
 
 const Reply = mongoose.model("Reply", replySchema);
-export default Reply;
+
+const replySchemaValidation = Yup.object().shape({
+  userId: Yup.string().required("User ID is required"),
+  text: Yup.string().required("Text is required"),
+});
+
+const validateReply = async (replyData) => {
+  return replySchemaValidation.validate(replyData, { abortEarly: false });
+};
+
+export { Reply, validateReply };

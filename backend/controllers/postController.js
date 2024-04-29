@@ -1,32 +1,30 @@
 import Post from "../models/Post.model.js";
+import { validatePost } from "../models/Post.model.js";
 import User from "../models/User.model.js";
 import Reply from "../models/Reply.model.js";
+import { validateReply } from "../models/Reply.model.js";
 import StatusCodes from "../utils/statusCodes.js";
 import checkPostExist from "../utils/helpers/checkPostExist.js";
 import checkUserExist from "../utils/helpers/checkUserExist.js";
 
 const createPost = async (req, res) => {
   try {
+    await validatePost(req.body);
+
     const { postedBy, text, img } = req.body;
-    if (!postedBy || !text) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "PostedBy and text fields are mandatory" });
-    }
+
     const user = await User.findById(postedBy);
     checkUserExist(user);
+
     if (user._id.toString() !== req.user._id.toString()) {
       return res
         .status(StatusCodes.UNAUTHORIZED)
         .json({ message: "Unauthorized to create post" });
     }
-    if (text.length > 500) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "Text length must be less than equal to 500" });
-    }
+
     const newPost = new Post({ postedBy, text, img });
     await newPost.save();
+
     return res
       .status(StatusCodes.CREATED)
       .json({ message: "Post created successfully" });
@@ -98,11 +96,8 @@ const replyToPost = async (req, res) => {
     const { text } = req.body;
     const userId = req.user._id;
 
-    if (!text) {
-      return res
-        .status(StatusCodes.NO_CONTENT)
-        .json({ message: "Text is required to post" });
-    }
+    // Validating the reply data
+    await validateReply(req.body);
 
     const post = await Post.findById(postId);
     checkPostExist(post);
@@ -127,9 +122,11 @@ const deleteReplyToPost = async (req, res) => {
     const post = await Post.findById(postId);
     checkPostExist(post);
 
-    const reply= await Reply.findById(replyId);
-    if(!reply){
-      return res.status(StatusCodes.NOT_FOUND).json({message: "Reply not found"})
+    const reply = await Reply.findById(replyId);
+    if (!reply) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: "Reply not found" });
     }
     await Reply.findByIdAndDelete(replyId);
 

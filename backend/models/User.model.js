@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import * as yup from "yup";
 
 const userSchema = mongoose.Schema(
   {
@@ -34,4 +35,23 @@ const userSchema = mongoose.Schema(
 );
 
 const User = mongoose.model("User", userSchema);
-export default User;
+
+// Define Yup schema for validation
+const userValidationSchema = yup.object().shape({
+  name: yup.string().required("Name is required"),
+  username: yup.string().required("Username is required"),
+  email: yup.string().email("Invalid email").required("Email is required"),
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+  profilePic: yup.string(),
+  bio: yup.string(),
+});
+
+// Validate function
+const validateUser = (userData) => {
+  return userValidationSchema.validate(userData, { abortEarly: false });
+};
+
+export { User, validateUser };
