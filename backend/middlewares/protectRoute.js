@@ -1,4 +1,4 @@
-import User from "../models/User.model.js";
+import {User} from "../models/User.model.js";
 import jwt from "jsonwebtoken";
 import StatusCodes from "../utils/statusCodes.js";
 // Checking if user is logged in to do actions

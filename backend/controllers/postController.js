@@ -1,7 +1,7 @@
-import Post from "../models/Post.model.js";
+import {Post} from "../models/Post.model.js";
 import { validatePost } from "../models/Post.model.js";
-import User from "../models/User.model.js";
-import Reply from "../models/Reply.model.js";
+import {User} from "../models/User.model.js";
+import {Reply} from "../models/Reply.model.js";
 import { validateReply } from "../models/Reply.model.js";
 import StatusCodes from "../utils/statusCodes.js";
 import checkPostExist from "../utils/helpers/checkPostExist.js";

@@ -1,6 +1,6 @@
-import User from "../models/User.model.js";
+import {User} from "../models/User.model.js";
 import { validateUser } from "../models/User.model.js";
-import Friend from "../models/Friend.model.js";
+import {Friend} from "../models/Friend.model.js";
 import { validateFriend } from "../models/Friend.model.js";
 import bcrypt from "bcryptjs";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAndSetCookie.js";
