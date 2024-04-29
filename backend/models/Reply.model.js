@@ -23,7 +23,7 @@ const replySchemaValidation = Yup.object().shape({
   text: Yup.string().required("Text is required"),
 });
 
-const validateReply = async (replyData) => {
+const validateReply = (replyData) => {
   return replySchemaValidation.validate(replyData, { abortEarly: false });
 };
 
