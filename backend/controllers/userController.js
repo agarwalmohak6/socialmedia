@@ -1,6 +1,6 @@
-import {User} from "../models/User.model.js";
+import { User } from "../models/User.model.js";
 import { validateUser } from "../models/User.model.js";
-import {Friend} from "../models/Friend.model.js";
+import { Friend } from "../models/Friend.model.js";
 import { validateFriend } from "../models/Friend.model.js";
 import bcrypt from "bcryptjs";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAndSetCookie.js";
@@ -51,7 +51,6 @@ const signUpUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   try {
-    await validateUser(req.body);
     const { username, password } = req.body;
     const user = await User.findOne({ username });
     const isPassCorrect = await bcrypt.compare(password, user?.password || "");
