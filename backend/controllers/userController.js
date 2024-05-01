@@ -59,12 +59,13 @@ const loginUser = async (req, res) => {
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "Invalid login credentials" });
     }
-    generateTokenAndSetCookie(user._id, res);
+    const token = generateTokenAndSetCookie(user._id, res);
     res.status(StatusCodes.OK).json({
       _id: user._id,
       name: user.name,
       email: user.email,
       username: user.username,
+      token,
     });
   } catch (error) {
     res
