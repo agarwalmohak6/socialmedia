@@ -1,5 +1,5 @@
 import * as React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -10,13 +10,71 @@ import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import axios from "axios";
+import * as yup from "yup";
 
 const defaultTheme = createTheme();
 
 export default function SignUp() {
-  const handleSubmit = (event) => {
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = React.useState({
+    name: "",
+    username: "",
+    email: "",
+    password: "",
+  });
+  const [errors, setErrors] = React.useState({});
+  // Define validation schema using yup
+  const validationSchema = yup.object().shape({
+    name: yup.string().required("Name is required"),
+    username: yup.string().required("Username is required"),
+    email: yup.string().email("Invalid email").required("Email is required"),
+    password: yup
+      .string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
+  });
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Add your form submission logic here
+    try {
+      await validationSchema.validate(formData, { abortEarly: false });
+      const response = await axios.post(
+        "http://localhost:5000/api/users/signup",
+        formData
+      );
+      if (response.status === 201) {
+        console.log("Form submitted:", formData);
+        alert("User Registered Successfully");
+        setFormData({
+          name: "",
+          username: "",
+          email: "",
+          password: "",
+        });
+        setErrors({});
+        navigate("/login");
+      }
+    } catch (error) {
+      if (error instanceof yup.ValidationError) {
+        const newErrors = {};
+        error.inner.forEach((validationError) => {
+          newErrors[validationError.path] = validationError.message;
+        });
+        setErrors(newErrors);
+      } else {
+        console.error("Error during form submission:", error);
+      }
+    }
   };
 
   return (
@@ -71,6 +129,10 @@ export default function SignUp() {
                 name="name"
                 autoComplete="name"
                 autoFocus
+                value={formData.name}
+                onChange={handleChange}
+                error={!!errors.name}
+                helperText={errors.name}
               />
               <TextField
                 margin="normal"
@@ -80,6 +142,10 @@ export default function SignUp() {
                 label="Username"
                 name="username"
                 autoComplete="username"
+                value={formData.username}
+                onChange={handleChange}
+                error={!!errors.username}
+                helperText={errors.username}
               />
               <TextField
                 margin="normal"
@@ -89,6 +155,10 @@ export default function SignUp() {
                 label="Email Address"
                 name="email"
                 autoComplete="email"
+                value={formData.email}
+                onChange={handleChange}
+                error={!!errors.email}
+                helperText={errors.email}
               />
               <TextField
                 margin="normal"
@@ -99,6 +169,10 @@ export default function SignUp() {
                 type="password"
                 id="password"
                 autoComplete="new-password"
+                value={formData.password}
+                onChange={handleChange}
+                error={!!errors.password}
+                helperText={errors.password}
               />
               <Button
                 type="submit"
