@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
+import axios from "axios";
 
 const userValidationSchema = yup.object().shape({
   name: yup.string().required("Name is required"),
@@ -36,26 +37,34 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       await userValidationSchema.validate(formData, { abortEarly: false });
-      console.log("Form submitted:", formData);
-      setFormData({
-        name: "",
-        username: "",
-        email: "",
-        password: "",
-        profilePic: "",
-        bio: "",
-      });
-      setErrors({});
-      navigate("/login");
+      const response = await axios.post(
+        "http://localhost:5000/api/users/signup",
+        formData // Pass form data to the server
+      );
+      if (response.status === 201) {
+        console.log("Form submitted:", formData);
+        alert("User Registered Successfully");
+        setFormData({
+          name: "",
+          username: "",
+          email: "",
+          password: "",
+          profilePic: "",
+          bio: "",
+        });
+        setErrors({});
+        if (response.status === 201) navigate("/login");
+      }
     } catch (validationErrors) {
-      const newErrors = {};
-      validationErrors.inner.forEach((error) => {
-        newErrors[error.path] = error.message;
-      });
-      setErrors(newErrors);
+      if (validationErrors && validationErrors.inner) {
+        const newErrors = {};
+        validationErrors.inner.forEach((error) => {
+          newErrors[error.path] = error.message;
+        });
+        setErrors(newErrors);
+      }
     }
   };
 
