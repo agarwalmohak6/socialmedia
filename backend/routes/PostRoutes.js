@@ -11,7 +11,7 @@ import {
 } from "../controllers/postController.js";
 
 router.post("/create", protectRoute, createPost);
-router.get("/:id", getPost);
+router.get("/:id",protectRoute, getPost);
 router.delete("/:id", protectRoute, deletePost);
 router.post("/like/:id",protectRoute, likeUnlikePost);
 router.post("/reply/:id",protectRoute, replyToPost);

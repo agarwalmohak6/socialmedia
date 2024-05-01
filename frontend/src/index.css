@@ -1,4 +1,27 @@
-*{
+* {
   margin: 0;
   padding: 0;
+}
+
+/* About Page CSS */
+.about-container {
+  margin: 50px auto;
+  padding: 20px;
+  max-width: 600px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+.about-heading {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+.about-info {
+  margin-bottom: 10px;
+}
+.about-label {
+  font-weight: bold;
+}
+.about-value {
+  margin-left: 10px;
 }

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import * as yup from "yup";
 
 const loginValidationSchema = yup.object().shape({
@@ -26,23 +27,35 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       await loginValidationSchema.validate(formData, { abortEarly: false });
+
+      // Make a POST request to the login endpoint using Axios
+      const response = await axios.post(
+        "http://localhost:5000/api/users/login",
+        formData
+      );
+
+      // Assuming the server responds with a token upon successful login
+      const { token } = response.data;
+      console.log(token);
+      // Perform actions after successful login, such as storing the token in local storage
+      localStorage.setItem("token", token);
+
       console.log("Login successful:", formData);
       setFormData({
         username: "",
         password: "",
       });
       setErrors({});
-      // Redirect to dashboard or desired page after successful login
-      navigate("/dashboard");
+      navigate("/about");
     } catch (validationErrors) {
-      const newErrors = {};
-      validationErrors.inner.forEach((error) => {
-        newErrors[error.path] = error.message;
-      });
-      setErrors(newErrors);
+      // const newErrors = {};
+      // validationErrors.inner.forEach((error) => {
+      //   newErrors[error.path] = error.message;
+      // });
+      // setErrors(newErrors);
+      console.log(validationErrors);
     }
   };
 
