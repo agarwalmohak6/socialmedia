@@ -19,13 +19,13 @@ export default function LoginPage() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = React.useState({
-    email: "",
+    username: "",
     password: "",
   });
   const [errors, setErrors] = React.useState({});
 
   const validationSchema = yup.object().shape({
-    email: yup.string().email("Invalid email").required("Email is required"),
+    username: yup.string().required("Username is required"),
     password: yup.string().required("Password is required"),
   });
 
@@ -46,8 +46,10 @@ export default function LoginPage() {
         formData
       );
       if (response.status === 200) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("username", response.data.username);
         console.log("User logged in successfully");
-        navigate("/welcome");
+        navigate("/about");
       }
     } catch (error) {
       if (error instanceof yup.ValidationError) {
@@ -58,7 +60,7 @@ export default function LoginPage() {
         setErrors(newErrors);
       } else {
         console.error("Login failed:", error.response.data.message);
-        setErrors({ server: "Invalid email or password" });
+        setErrors({ server: "Invalid username or password" });
       }
     }
   };
@@ -110,15 +112,14 @@ export default function LoginPage() {
                 margin="normal"
                 required
                 fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
+                id="username"
+                label="Username"
+                name="username"
                 autoFocus
-                value={formData.email}
+                value={formData.username}
                 onChange={handleChange}
-                error={!!errors.email}
-                helperText={errors.email}
+                error={!!errors.username}
+                helperText={errors.username}
               />
               <TextField
                 margin="normal"
