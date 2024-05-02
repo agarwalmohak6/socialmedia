@@ -1,17 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-// import { jwtDecode } from "jwt-decode";
 
 const About = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     const username = localStorage.getItem("username");
-    //   if (!token) {
-    //     console.log("Token missing in frontend");
-    //     return;
-    //   }
-    //   const decoded = jwtDecode(token);
     const fetchUserDetails = async () => {
       try {
         const response = await axios.get(
@@ -27,10 +21,10 @@ const About = () => {
   }, []);
 
   return (
-    <div className="container">
-      <h1 className="title">About Us</h1>
+    <div className="about-container">
+      <h1 className="about-title">About Us</h1>
       {user && (
-        <div className="user-details">
+        <div className="about-user-details">
           <h2>User Details</h2>
           <p>
             <strong>Name:</strong> {user.name}

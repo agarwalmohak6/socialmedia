@@ -19,11 +19,11 @@ const YourPosts = () => {
         );
         if (!response) setPosts([]);
         else setPosts(response.data.reverse());
+        console.log("Posts array is:",posts);
       } catch (error) {
         console.error("Error fetching posts:", error);
       }
     };
-
     fetchPosts();
   }, []);
 

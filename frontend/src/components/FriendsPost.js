@@ -27,7 +27,7 @@ const FriendsPost = () => {
 
         const postsData = [];
         for (const friend of friendsResponse.data.friends) {
-          console.log(friend.id);
+          // console.log(friend.id);
           const response = await axios.get(
             `http://localhost:5000/api/posts/all/${friend.id}`
           );

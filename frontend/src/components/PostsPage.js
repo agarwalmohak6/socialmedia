@@ -7,7 +7,7 @@ import FriendsPost from "./FriendsPost";
 const PostsPage = () => {
   const [tabValue, setTabValue] = useState(0);
   return (
-    <div className="landing-page">
+    <div className="posts-page">
       <h1 className="page-title">Posts</h1>
       <Tabs
         value={tabValue}

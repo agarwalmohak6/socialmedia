@@ -2,7 +2,7 @@ import React from "react";
 
 const Home = () => {
   return (
-    <div className="landing-page">
+    <div className="home-page">
       <div className="title">
         <h1 className="app-name">MySocial</h1>
       </div>
