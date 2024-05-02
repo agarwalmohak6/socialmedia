@@ -38,7 +38,6 @@ a {
   background-position: center;
   filter: brightness(70%);
 }
-
 .content {
   position: relative;
   z-index: 1;
@@ -48,33 +47,27 @@ a {
   align-items: center;
   height: 100%;
 }
-
 .features {
   display: flex;
   justify-content: center;
   margin-top: 2rem;
 }
-
 .feature {
   text-align: center;
   margin: 0 1.5rem;
   color: #fff;
   transition: transform 0.3s ease-in-out;
 }
-
 .feature i {
   font-size: 3rem;
 }
-
 .feature p {
   margin-top: 0.5rem;
   font-size: 1.5rem;
 }
-
 .feature:hover {
   transform: translateY(-10px);
 }
-
 
 /* About CSS */
 .container {
