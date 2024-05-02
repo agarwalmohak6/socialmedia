@@ -6,17 +6,66 @@ import About from "./components/About";
 import Contact from "./components/Contact";
 import Login from "./components/Login";
 import Register from "./components/Register";
+import PostsPage from "./components/PostsPage";
 
 function App() {
   return (
     <>
-      <ResponsiveAppBar />
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route
+          path="/"
+          element={
+            <>
+              <ResponsiveAppBar />
+              <Home />
+            </>
+          }
+        />
+        <Route
+          path="/about"
+          element={
+            <>
+              <ResponsiveAppBar />
+              <About />
+            </>
+          }
+        />
+        <Route
+          path="/contact"
+          element={
+            <>
+              <ResponsiveAppBar />
+              <Contact />
+            </>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <>
+              <ResponsiveAppBar />
+              <Login />
+            </>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <>
+              <ResponsiveAppBar />
+              <Register />
+            </>
+          }
+        />
+        <Route
+          path="/postsPage"
+          element={
+            <>
+              <ResponsiveAppBar />
+              <PostsPage />
+            </>
+          }
+        />
         {/* Add more routes as needed */}
       </Routes>
     </>

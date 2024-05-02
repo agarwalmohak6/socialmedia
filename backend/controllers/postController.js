@@ -1,7 +1,7 @@
-import {Post} from "../models/Post.model.js";
+import { Post } from "../models/Post.model.js";
 import { validatePost } from "../models/Post.model.js";
-import {User} from "../models/User.model.js";
-import {Reply} from "../models/Reply.model.js";
+import { User } from "../models/User.model.js";
+import { Reply } from "../models/Reply.model.js";
 import { validateReply } from "../models/Reply.model.js";
 import StatusCodes from "../utils/statusCodes.js";
 import checkPostExist from "../utils/helpers/checkPostExist.js";
@@ -43,6 +43,18 @@ const getPost = async (req, res) => {
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
     console.log("Error in getPost", error.message);
+  }
+};
+
+const getAllPosts = async (req, res) => {
+  const { postedBy } = req.params;
+  try {
+    const posts = await Post.find({postedBy});
+    checkPostExist(posts);
+    return res.status(StatusCodes.OK).json(posts);
+  } catch (error) {
+    res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
+    console.log("Error in getAllPosts", error.message);
   }
 };
 
@@ -140,6 +152,7 @@ const deleteReplyToPost = async (req, res) => {
 export {
   createPost,
   getPost,
+  getAllPosts,
   deletePost,
   likeUnlikePost,
   replyToPost,

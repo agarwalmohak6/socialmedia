@@ -189,6 +189,7 @@ const getFriends = async (req, res) => {
     });
     const friends = await User.find({ _id: { $in: friendIds } });
     const friendNames = friends.map((friend) => ({
+      id: friend._id,
       username: friend.username,
       name: friend.name,
     }));

@@ -12,16 +12,9 @@ import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import { NavLink } from "react-router-dom";
 
-const pages = [
-  { name: "Home", path: "/" },
-  { name: "About", path: "/about" },
-  { name: "Contact", path: "/contact" },
-  { name: "Login", path: "/login" },
-  { name: "Register", path: "/register" },
-];
-
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
+
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -29,6 +22,23 @@ function ResponsiveAppBar() {
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
+
+  const handleLogout = () => {
+    localStorage.clear(); // Clear local storage
+  };
+
+  const token = localStorage.getItem("token");
+  const pages = [];
+  if (token) {
+    pages.push({ name: "About", path: "/about" });
+    pages.push({ name: "Posts", path: "/postsPage" });
+    pages.push({ name: "Logout", path: "/login" });
+  } else {
+    pages.push({ name: "Home", path: "/" });
+    pages.push({ name: "Contact", path: "/contact" });
+    pages.push({ name: "Login", path: "/login" });
+    pages.push({ name: "Register", path: "/register" });
+  }
 
   return (
     <AppBar position="static">
@@ -124,7 +134,9 @@ function ResponsiveAppBar() {
                 key={page.name}
                 component={NavLink}
                 to={page.path}
-                onClick={handleCloseNavMenu}
+                onClick={
+                  page.name === "Logout" ? handleLogout : handleCloseNavMenu
+                }
                 sx={{ my: 2, color: "white", display: "block" }}
               >
                 {page.name}
@@ -136,4 +148,5 @@ function ResponsiveAppBar() {
     </AppBar>
   );
 }
+
 export default ResponsiveAppBar;

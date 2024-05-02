@@ -17,7 +17,6 @@ const defaultTheme = createTheme();
 
 export default function LoginPage() {
   const navigate = useNavigate();
-
   const [formData, setFormData] = React.useState({
     username: "",
     password: "",
@@ -48,8 +47,7 @@ export default function LoginPage() {
       if (response.status === 200) {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("username", response.data.username);
-        console.log("User logged in successfully");
-        navigate("/about");
+        navigate("/postsPage");
       }
     } catch (error) {
       if (error instanceof yup.ValidationError) {
