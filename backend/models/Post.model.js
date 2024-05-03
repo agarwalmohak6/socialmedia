@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import * as yup from "yup";
 
 const postValidationSchema = yup.object().shape({
-  postedBy: yup.string().required("Posted by user ID is required"),
+  postedBy: yup.string(),
   text: yup.string().max(500, "Text cannot exceed 500 characters"),
   img: yup.string().url("Invalid image URL format"),
   likes: yup.array(),
@@ -13,7 +13,6 @@ const postSchema = mongoose.Schema(
     postedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
     },
     text: {
       type: String,

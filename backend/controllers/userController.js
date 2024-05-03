@@ -94,9 +94,8 @@ const followUnfollowUser = async (req, res) => {
     const { id } = req.params;
     await validateFriend(req.body);
     const userToModify = await User.findById(id); // user to follow or unfollow
-    const currentUser = await User.findById(req.user._id); // logged in user
-    checkUserExist(userToModify);
-    checkUserExist(currentUser);
+    const currentUser= req.user._id.toString();  // logged in user
+    checkUserExist(userToModify, res);
     if (userToModify._id.equals(currentUser._id)) {
       return res
         .status(StatusCodes.BAD_REQUEST)
@@ -107,7 +106,7 @@ const followUnfollowUser = async (req, res) => {
       followRequestTo: userToModify._id,
     });
     if (existingFriendship) {
-      await Friend.deleteOne(existingFriendship); // Fix: Use deleteOne instead of remove
+      await Friend.deleteOne(existingFriendship); 
       res
         .status(StatusCodes.OK)
         .json({ message: "User unfollowed successfully" });
@@ -166,7 +165,7 @@ const getUserProfile = async (req, res) => {
     let user = await User.findOne({ username })
       .select("-password")
       .select("-updatedAt");
-    checkUserExist(user);
+    checkUserExist(user, res);
     return res.status(StatusCodes.OK).json(user);
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });

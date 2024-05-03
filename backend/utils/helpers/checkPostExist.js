@@ -1,5 +1,5 @@
 import StatusCodes from "../statusCodes.js";
-const checkPostExist = (post) => {
+const checkPostExist = (post, res) => {
   if (!post) {
     return res
       .status(StatusCodes.NOT_FOUND)

@@ -1,5 +1,5 @@
 import StatusCodes from "../statusCodes.js";
-const checkUserExist = (user) => {
+const checkUserExist = (user, res) => {
   if (!user) {
     return res
       .status(StatusCodes.NOT_FOUND)

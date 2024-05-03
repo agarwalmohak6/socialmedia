@@ -1,27 +1,15 @@
 import { Post } from "../models/Post.model.js";
 import { validatePost } from "../models/Post.model.js";
-import { User } from "../models/User.model.js";
 import { Reply } from "../models/Reply.model.js";
 import { validateReply } from "../models/Reply.model.js";
 import StatusCodes from "../utils/statusCodes.js";
 import checkPostExist from "../utils/helpers/checkPostExist.js";
-import checkUserExist from "../utils/helpers/checkUserExist.js";
 
 const createPost = async (req, res) => {
   try {
     await validatePost(req.body);
-
-    const { postedBy, text, img } = req.body;
-
-    const user = await User.findById(postedBy);
-    checkUserExist(user);
-
-    if (user._id.toString() !== req.user._id.toString()) {
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ message: "Unauthorized to create post" });
-    }
-
+    const { text, img } = req.body;
+    const postedBy = req.user._id.toString();
     const newPost = new Post({ postedBy, text, img });
     await newPost.save();
 
@@ -38,7 +26,7 @@ const getPost = async (req, res) => {
   const { id } = req.params;
   try {
     const post = await Post.findById(id);
-    checkPostExist(post);
+    checkPostExist(post, res);
     return res.status(StatusCodes.OK).json(post);
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
@@ -49,8 +37,8 @@ const getPost = async (req, res) => {
 const getAllPosts = async (req, res) => {
   const { postedBy } = req.params;
   try {
-    const posts = await Post.find({postedBy});
-    checkPostExist(posts);
+    const posts = await Post.find({ postedBy });
+    checkPostExist(posts, res);
     return res.status(StatusCodes.OK).json(posts);
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
@@ -63,7 +51,7 @@ const deletePost = async (req, res) => {
   try {
     const post = await Post.findById(id);
     const userId = req.user._id;
-    checkPostExist(post);
+    checkPostExist(post, res);
     if (post.postedBy.toString() !== userId.toString()) {
       return res
         .status(StatusCodes.UNAUTHORIZED)
@@ -83,7 +71,7 @@ const likeUnlikePost = async (req, res) => {
   const { id } = req.params;
   try {
     const post = await Post.findById(id);
-    checkPostExist(post);
+    checkPostExist(post, res);
     if (post.likes.includes(req.user._id)) {
       await Post.updateOne({ id }, { $pull: { likes: req.user._id } });
       return res
@@ -112,7 +100,7 @@ const replyToPost = async (req, res) => {
     await validateReply(req.body);
 
     const post = await Post.findById(postId);
-    checkPostExist(post);
+    checkPostExist(post, res);
 
     const reply = new Reply({ userId, text });
     await reply.save();
@@ -132,7 +120,7 @@ const deleteReplyToPost = async (req, res) => {
     const replyId = req.params.id2;
 
     const post = await Post.findById(postId);
-    checkPostExist(post);
+    checkPostExist(post, res);
 
     const reply = await Reply.findById(replyId);
     if (!reply) {
