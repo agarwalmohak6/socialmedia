@@ -25,6 +25,10 @@ const postSchema = mongoose.Schema(
       type: [],
       default: [],
     },
+    replies: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Reply"
+    }]
   },
   { timestamps: true }
 );
