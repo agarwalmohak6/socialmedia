@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import handleLikeHelper from "../helper/handleLikeHelper";
 
 const FriendsPost = () => {
   const [friends, setFriends] = useState([]);
   const [posts, setPosts] = useState([]);
+  const token = localStorage.getItem("token");
+  const decoded = jwtDecode(token);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     if (!token) {
       console.log("Token missing in frontend");
       return;
     }
-    const decoded = jwtDecode(token);
-
     const fetchData = async () => {
       try {
         const friendsResponse = await axios.get(
-          `http://localhost:5000/api/users/friends/${decoded.userId}`
+          `http://localhost:5000/api/users/friends/${decoded.userId}`,
+          { headers: { Authorization: token } }
         );
         if (!friendsResponse.data) {
           setFriends([]);
@@ -27,9 +28,9 @@ const FriendsPost = () => {
 
         const postsData = [];
         for (const friend of friendsResponse.data.friends) {
-          // console.log(friend.id);
           const response = await axios.get(
-            `http://localhost:5000/api/posts/all/${friend.id}`
+            `http://localhost:5000/api/posts/all/${friend.id}`,
+            { headers: { Authorization: token } }
           );
           if (response.data) {
             postsData.push(...response.data);
@@ -42,15 +43,17 @@ const FriendsPost = () => {
     };
 
     fetchData();
-  }, []);
-  const handleLike = (postId) => {
-    // Logic to handle liking a post
-    console.log("Liked post with ID:", postId);
+  }, [decoded.userId, token]);
+
+  const handleLike = (id) => {
+    handleLikeHelper(id, token, setPosts, posts);
   };
+
   const handleAddComment = (postId) => {
     // Logic to handle adding a comment to a post
     console.log("Add comment to post with ID:", postId);
   };
+
   return (
     <div className="post-container">
       {posts.map((post) => (

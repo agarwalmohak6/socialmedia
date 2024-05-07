@@ -4,7 +4,7 @@ import StatusCodes from "../utils/statusCodes.js";
 // Checking if user is logged in to do actions
 const protectRoute = async (req, res, next) => {
   try {
-    const token = req.cookies.token || localStorage.getItem("token");
+    const token = req.headers.authorization;
     if (!token) {
       return res
         .status(StatusCodes.UNAUTHORIZED)

@@ -13,7 +13,7 @@ import {
 
 router.post("/create", protectRoute, createPost);
 router.get("/:id", getPost);
-router.get("/all/:postedBy",getAllPosts);
+router.get("/all/:postedBy",protectRoute,getAllPosts);
 router.delete("/:id", protectRoute, deletePost);
 router.post("/like/:id",protectRoute, likeUnlikePost);
 router.post("/reply/:id",protectRoute, replyToPost);

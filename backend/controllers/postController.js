@@ -72,23 +72,33 @@ const likeUnlikePost = async (req, res) => {
   try {
     const post = await Post.findById(id);
     checkPostExist(post, res);
-    if (post.likes.includes(req.user._id)) {
-      await Post.updateOne({ id }, { $pull: { likes: req.user._id } });
+    const userId = req.user._id;
+
+    if (post.likes.includes(userId)) {
+      // If the user already liked the post, unlike it
+      await Post.findByIdAndUpdate(id, { $pull: { likes: userId } });
+      const updatedPost = await Post.findById(id);
+      const likeCount = updatedPost.likes.length;
       return res
-        .status(StatusCodes.CREATED)
-        .json({ message: "Post unliked successfully" });
+        .status(StatusCodes.OK)
+        .json({ message: "Post unliked successfully", likeCount });
     } else {
-      post.likes.push(req.user._id);
+      // If the user hasn't liked the post, like it
+      post.likes.push(userId);
       await post.save();
+      const updatedPost = await Post.findById(id);
+      const likeCount = updatedPost.likes.length;
       return res
-        .status(StatusCodes.CREATED)
-        .json({ message: "Post liked successfully" });
+        .status(StatusCodes.OK)
+        .json({ message: "Post liked successfully", likeCount });
     }
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
-    console.log("Error in likePost", error.message);
+    console.log("Error in likeUnlikePost", error.message);
   }
 };
+
+
 
 const replyToPost = async (req, res) => {
   try {

@@ -1,41 +1,43 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import handleLikeHelper from "../helper/handleLikeHelper";
 
 const YourPosts = () => {
   const [posts, setPosts] = useState([]);
+  const token = localStorage.getItem("token");
+  const decoded = jwtDecode(token);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.log("Token missing in frontend");
-      return;
-    }
-    const decoded = jwtDecode(token);
     const fetchPosts = async () => {
       try {
+        const config = {
+          headers: {
+            Authorization: token,
+          },
+        };
         const response = await axios.get(
-          `http://localhost:5000/api/posts/all/${decoded.userId}`
+          `http://localhost:5000/api/posts/all/${decoded.userId}`,
+          config
         );
         if (!response) setPosts([]);
         else setPosts(response.data.reverse());
-        console.log("Posts array is:",posts);
       } catch (error) {
         console.error("Error fetching posts:", error);
       }
     };
     fetchPosts();
-  }, []);
+  }, [decoded.userId, token]);
 
-  const handleLike = (postId) => {
-    // Logic to handle liking a post
-    console.log("Liked post with ID:", postId);
+  const handleLike = (id) => {
+    handleLikeHelper(id, token, setPosts, posts);
   };
 
   const handleAddComment = (postId) => {
     // Logic to handle adding a comment to a post
     console.log("Add comment to post with ID:", postId);
   };
+
   return (
     <div className="post-container">
       {posts.map((post) => (
