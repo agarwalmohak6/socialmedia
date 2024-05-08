@@ -98,8 +98,6 @@ const likeUnlikePost = async (req, res) => {
   }
 };
 
-
-
 const replyToPost = async (req, res) => {
   try {
     const postId = req.params.id;
@@ -112,7 +110,7 @@ const replyToPost = async (req, res) => {
     const post = await Post.findById(postId);
     checkPostExist(post, res);
 
-    const reply = new Reply({ userId, text });
+    const reply = new Reply({ postId, userId, text });
     await reply.save();
 
     res
@@ -147,6 +145,31 @@ const deleteReplyToPost = async (req, res) => {
   }
 };
 
+const getAllReplies = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the post by its ID
+    const post = await Post.findById(id);
+    
+    // Check if the post exists
+    if (!post) {
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "Post not found" });
+    }
+
+    // Find all replies associated with the post
+    const replies = await Reply.find({ postId: id });
+    
+    // Return the replies
+    return res.status(StatusCodes.OK).json(replies);
+  } catch (error) {
+    // Handle any errors
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
+    console.log("Error in getAllReplies", error.message);
+  }
+};
+
+
 export {
   createPost,
   getPost,
@@ -155,4 +178,5 @@ export {
   likeUnlikePost,
   replyToPost,
   deleteReplyToPost,
+  getAllReplies
 };
