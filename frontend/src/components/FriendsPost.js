@@ -34,7 +34,7 @@ const YourPosts = () => {
   }, [decoded.userId, token]);
 
   useEffect(() => {
-    fetchCommentsCountHelper(posts, token, setCommentsCount); // Calling the fetchCommentsCountHelper function
+    fetchCommentsCountHelper(posts, token, setCommentsCount);
   }, [posts, token]);
 
   const handleLike = (id) => {
@@ -50,13 +50,18 @@ const YourPosts = () => {
     handleCommentShowHelper(postId, token, showComments, setShowComments);
   };
 
+  // Function to check if the post is liked by the logged-in user
+  const isPostLikedByUser = (post) => {
+    return post.likes.includes(decoded.userId);
+  };
+
   return (
     <div className="posts-page">
       <h1 className="page-title">Your Posts</h1>
       <div className="post-container">
         {posts.map((post) => (
           <div key={post._id} className="post">
-            <img src={post.img} alt="Post" className="post-image" />
+            {post.img && <img src={post.img} alt="Post" className="post-image" />}
             <div className="post-content">
               <p className="post-text">{post.text}</p>
               <div className="post-details">
@@ -68,7 +73,7 @@ const YourPosts = () => {
                     className="like-button"
                     onClick={() => handleLike(post._id)}
                   >
-                    Like
+                    {isPostLikedByUser(post) ? "Unlike" : "Like"}
                   </button>
                   <button
                     className="comment-button"
@@ -78,7 +83,7 @@ const YourPosts = () => {
                   </button>
                   <button
                     className="show-comments-button"
-                    onClick={() => handleShowComments(post._id)} // Calling handleShowComments
+                    onClick={() => handleShowComments(post._id)}
                   >
                     Show Comments
                   </button>

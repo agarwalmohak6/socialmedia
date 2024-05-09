@@ -12,7 +12,6 @@ const createPost = async (req, res) => {
     const postedBy = req.user._id.toString();
     const newPost = new Post({ postedBy, text, img });
     await newPost.save();
-
     return res
       .status(StatusCodes.CREATED)
       .json({ message: "Post created successfully" });
@@ -151,24 +150,27 @@ const getAllReplies = async (req, res) => {
 
     // Find the post by its ID
     const post = await Post.findById(id);
-    
+
     // Check if the post exists
     if (!post) {
-      return res.status(StatusCodes.NOT_FOUND).json({ message: "Post not found" });
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: "Post not found" });
     }
 
     // Find all replies associated with the post
     const replies = await Reply.find({ postId: id });
-    
+
     // Return the replies
     return res.status(StatusCodes.OK).json(replies);
   } catch (error) {
     // Handle any errors
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: error.message });
     console.log("Error in getAllReplies", error.message);
   }
 };
-
 
 export {
   createPost,
@@ -178,5 +180,5 @@ export {
   likeUnlikePost,
   replyToPost,
   deleteReplyToPost,
-  getAllReplies
+  getAllReplies,
 };
