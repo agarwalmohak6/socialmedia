@@ -5,7 +5,8 @@ import handleLikeHelper from "../helper/handleLikeHelper";
 import handleCommentShowHelper from "../helper/handleCommentShowHelper";
 import fetchCommentsCountHelper from "../helper/fetchCommentsCountHelper";
 
-const YourPosts = () => {
+const FriendsPost = () => {
+  const [friends, setFriends] = useState([]);
   const [posts, setPosts] = useState([]);
   const [commentsCount, setCommentsCount] = useState({});
   const [showComments, setShowComments] = useState({});
@@ -13,24 +14,40 @@ const YourPosts = () => {
   const decoded = jwtDecode(token);
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    if (!token) {
+      console.log("Token missing in frontend");
+      return;
+    }
+
+    const fetchData = async () => {
       try {
-        const config = {
-          headers: {
-            Authorization: token,
-          },
-        };
-        const response = await axios.get(
-          `http://localhost:5000/api/posts/all/${decoded.userId}`,
-          config
+        const friendsResponse = await axios.get(
+          `http://localhost:5000/api/users/friends/${decoded.userId}`,
+          { headers: { Authorization: token } }
         );
-        if (!response) setPosts([]);
-        else setPosts(response.data.reverse());
+        if (!friendsResponse.data) {
+          setFriends([]);
+        } else {
+          setFriends(friendsResponse.data.friends); // Set friends array
+        }
+
+        const postsData = [];
+        for (const friend of friendsResponse.data.friends) {
+          const response = await axios.get(
+            `http://localhost:5000/api/posts/all/${friend.id}`,
+            { headers: { Authorization: token } }
+          );
+          if (response.data) {
+            postsData.push(...response.data);
+          }
+        }
+        setPosts(postsData.reverse());
       } catch (error) {
-        console.error("Error fetching posts:", error);
+        console.error("Error fetching data:", error);
       }
     };
-    fetchPosts();
+
+    fetchData();
   }, [decoded.userId, token]);
 
   useEffect(() => {
@@ -41,91 +58,128 @@ const YourPosts = () => {
     handleLikeHelper(id, token, setPosts, posts);
   };
 
-  const handleAddComment = (postId) => {
-    // Logic to handle adding a comment to a post
-    console.log("Add comment to post with ID:", postId);
+  const handleUnlike = (id) => {
+    handleLikeHelper(id, token, setPosts, posts, true);
+  };
+
+  const handleAddComment = async (postId) => {
+    try {
+      const commentText = prompt("Enter your comment:");
+      if (!commentText) return;
+      const config = {
+        headers: {
+          Authorization: token,
+        },
+      };
+
+      const response = await axios.post(
+        `http://localhost:5000/api/posts/reply/${postId}`,
+        { text: commentText },
+        config
+      );
+
+      const newComment = response.data;
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post._id === postId
+            ? {
+                ...post,
+                comments: (post.comments || []).concat(newComment),
+              }
+            : post
+        )
+      );
+      setCommentsCount((prevCommentsCount) => ({
+        ...prevCommentsCount,
+        [postId]: (prevCommentsCount[postId] || 0) + 1,
+      }));
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
   };
 
   const handleShowComments = (postId) => {
     handleCommentShowHelper(postId, token, showComments, setShowComments);
   };
 
-  // Function to check if the post is liked by the logged-in user
   const isPostLikedByUser = (post) => {
     return post.likes.includes(decoded.userId);
   };
 
   return (
-    <div className="posts-page">
-      <h1 className="page-title">Your Posts</h1>
-      <div className="post-container">
-        {posts.map((post) => (
-          <div key={post._id} className="post">
-            {post.img && <img src={post.img} alt="Post" className="post-image" />}
-            <div className="post-content">
-              <p className="post-text">{post.text}</p>
-              <div className="post-details">
-                <p className="post-created-at">
-                  Created At: {new Date(post.createdAt).toLocaleString()}
-                </p>
-                <div className="post-actions">
+    <div className="post-container">
+      {posts.map((post) => (
+        <div key={post._id} className="post">
+          <img src={post.img} alt="Post" className="post-image" />
+          <div className="post-content">
+            <p className="post-text">{post.text}</p>
+            <div className="post-details">
+              <p className="post-created-at">
+                Created At: {new Date(post.createdAt).toLocaleString()}
+              </p>
+              <div className="post-actions">
+                {isPostLikedByUser(post) ? (
+                  <button
+                    className="like-button"
+                    onClick={() => handleUnlike(post._id)}
+                  >
+                    Unlike
+                  </button>
+                ) : (
                   <button
                     className="like-button"
                     onClick={() => handleLike(post._id)}
                   >
-                    {isPostLikedByUser(post) ? "Unlike" : "Like"}
+                    Like
                   </button>
-                  <button
-                    className="comment-button"
-                    onClick={() => handleAddComment(post._id)}
-                  >
-                    Add Comment
-                  </button>
-                  <button
-                    className="show-comments-button"
-                    onClick={() => handleShowComments(post._id)}
-                  >
-                    Show Comments
-                  </button>
-                </div>
-                <div className="post-stats">
-                  <p className="likes-count">{post.likes.length} Likes</p>
-                  <p className="comments-count">
-                    {commentsCount[post._id] || 0} Comments
-                  </p>
-                </div>
+                )}
+                <button
+                  className="comment-button"
+                  onClick={() => handleAddComment(post._id)}
+                >
+                  Add Comment
+                </button>
+                <button
+                  className="show-comments-button"
+                  onClick={() => handleShowComments(post._id)}
+                >
+                  Show Comments
+                </button>
+              </div>
+              <div className="post-stats">
+                <p className="likes-count">{post.likes.length} Likes</p>
+                <p className="comments-count">
+                  {commentsCount[post._id] || 0} Comments
+                </p>
               </div>
             </div>
           </div>
-        ))}
-        {/* Comments popups for each post */}
-        {Object.entries(showComments).map(
-          ([postId, comments]) =>
-            showComments[postId] && (
-              <div key={postId} className="comments-popup">
-                <h2>Comments</h2>
-                {comments.map((comment, index) => (
-                  <div key={index} className="comment">
-                    <p>{comment.text}</p>
-                  </div>
-                ))}
-                <button
-                  className="close-popup"
-                  onClick={() =>
-                    setShowComments((prevShowComments) => ({
-                      ...prevShowComments,
-                      [postId]: null,
-                    }))
-                  }
-                >
-                  Close
-                </button>
-              </div>
-            )
-        )}
-      </div>
+          {/* Comments popup for the post */}
+          {showComments[post._id] && (
+            <div className="comments-popup">
+              <h2>Comments</h2>
+              {showComments[post._id].map((comment, index) => (
+                <div key={index} className="comment">
+                  <p>{comment.text}</p>
+                </div>
+              ))}
+              <button
+                className="close-popup"
+                onClick={() =>
+                  setShowComments((prevShowComments) => ({
+                    ...prevShowComments,
+                    [post._id]: null,
+                  }))
+                }
+              >
+                Close
+              </button>
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 };
 
-export default YourPosts;
+export default FriendsPost;

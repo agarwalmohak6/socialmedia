@@ -41,9 +41,38 @@ const YourPosts = () => {
     handleLikeHelper(id, token, setPosts, posts);
   };
 
-  const handleAddComment = (postId) => {
-    // Logic to handle adding a comment to a post
-    console.log("Add comment to post with ID:", postId);
+  const handleAddComment = async (postId) => {
+    try {
+      const commentText = prompt("Enter your comment:");
+      if (!commentText) return;
+      const config = {
+        headers: {
+          Authorization: token,
+        },
+      };
+      const response = await axios.post(
+        `http://localhost:5000/api/posts/reply/${postId}`,
+        { text: commentText },
+        config
+      );
+      const newComment = response.data;
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post._id === postId
+            ? {
+                ...post,
+                comments: (post.comments || []).concat(newComment),
+              }
+            : post
+        )
+      );
+      setCommentsCount((prevCommentsCount) => ({
+        ...prevCommentsCount,
+        [postId]: (prevCommentsCount[postId] || 0) + 1,
+      }));
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
   };
 
   const handleShowComments = (postId) => {
@@ -61,7 +90,9 @@ const YourPosts = () => {
       <div className="post-container">
         {posts.map((post) => (
           <div key={post._id} className="post">
-            {post.img && <img src={post.img} alt="Post" className="post-image" />}
+            {post.img && (
+              <img src={post.img} alt="Post" className="post-image" />
+            )}
             <div className="post-content">
               <p className="post-text">{post.text}</p>
               <div className="post-details">
