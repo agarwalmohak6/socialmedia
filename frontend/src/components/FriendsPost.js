@@ -6,7 +6,7 @@ import handleCommentShowHelper from "../helper/handleCommentShowHelper";
 import fetchCommentsCountHelper from "../helper/fetchCommentsCountHelper";
 
 const FriendsPost = () => {
-  const [friends, setFriends] = useState([]);
+  const [, setFriends] = useState([]);
   const [posts, setPosts] = useState([]);
   const [commentsCount, setCommentsCount] = useState({});
   const [showComments, setShowComments] = useState({});
