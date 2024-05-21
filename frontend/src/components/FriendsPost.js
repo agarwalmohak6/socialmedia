@@ -7,7 +7,7 @@ import {
   fetchFriendsPost,
   fetchComments,
   addComment,
-} from "../redux/postSlice";
+} from "../redux/postActions.js";
 
 const FriendsPost = () => {
   const [showComments, setShowComments] = useState({});

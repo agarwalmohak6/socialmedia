@@ -8,7 +8,7 @@ import {
   fetchComments,
   addComment,
   createPost,
-} from "../redux/postSlice";
+} from "../redux/postActions.js";
 
 const YourPosts = () => {
   const [showComments, setShowComments] = useState({});
@@ -18,6 +18,7 @@ const YourPosts = () => {
 
   const token = localStorage.getItem("token");
   const decoded = jwtDecode(token);
+  console.log(decoded)
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.posts.posts);
   const commentsCount = useSelector((state) => state.posts.commentsCount);
