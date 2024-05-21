@@ -5,11 +5,12 @@ import axios from "axios";
 
 const initialState = {
   posts: [],
-  like:[],
-  comment:[],
+  comments: {},
+  commentsCount: {},
   loading: false,
   error: null,
 };
+
 export const fetchPosts = createAsyncThunk("fetchPosts", async () => {
   try {
     const token = localStorage.getItem("token");
@@ -23,57 +24,143 @@ export const fetchPosts = createAsyncThunk("fetchPosts", async () => {
       `http://localhost:5000/api/posts/all/${decoded.userId}`,
       config
     );
-    return response;
-    // if (!response) setPosts([]);
-    // else setPosts(response.data.reverse());
+    return response.data;
   } catch (error) {
     console.error("Error fetching posts:", error);
+    throw error;
   }
 });
+
+export const fetchFriendsPost = createAsyncThunk(
+  "fetchFriendsPost",
+  async () => {
+    const token = localStorage.getItem("token");
+    const decoded = jwtDecode(token);
+    const friendsResponse = await axios.get(
+      `http://localhost:5000/api/users/friends/${decoded.userId}`,
+      {
+        headers: { Authorization: token },
+      }
+    );
+
+    const friends = friendsResponse.data.friends || [];
+    const postsData = [];
+
+    for (const friend of friends) {
+      const response = await axios.get(
+        `http://localhost:5000/api/posts/all/${friend.id}`,
+        {
+          headers: { Authorization: token },
+        }
+      );
+      if (response.data) {
+        postsData.push(...response.data);
+      }
+    }
+
+    return postsData;
+  }
+);
+
+export const handleLike = createAsyncThunk("handleLike", async ({ id }) => {
+  try {
+    const token = localStorage.getItem("token");
+    const config = {
+      headers: {
+        Authorization: token,
+      },
+    };
+    const url = `http://localhost:5000/api/posts/like/${id}`;
+    await axios.post(url, {}, config);
+
+    // Fetch the updated post data after the like/unlike action
+    const updatedPostResponse = await axios.get(
+      `http://localhost:5000/api/posts/${id}`,
+      config
+    );
+
+    return updatedPostResponse.data;
+  } catch (error) {
+    console.error("Error liking/unliking post:", error);
+    throw error;
+  }
+});
+
+export const fetchComments = createAsyncThunk("posts/fetchComments", async (postId) => {
+  try {
+    const token = localStorage.getItem("token");
+    const config = {
+      headers: {
+        Authorization: token,
+      },
+    };
+    const response = await axios.get(
+      `http://localhost:5000/api/posts/allReply/${postId}`,
+      config
+    );
+    return { postId, comments: response.data };
+  } catch (error) {
+    console.error("Error fetching replies:", error);
+    throw error;
+  }
+});
+
+
+export const fetchCommentsCount = createAsyncThunk(
+  "fetchCommentsCount",
+  async (posts) => {
+    try {
+      const token = localStorage.getItem("token");
+      const config = {
+        headers: {
+          Authorization: token,
+        },
+      };
+      const commentsCounts = {};
+      await Promise.all(
+        posts.map(async (post) => {
+          const response = await axios.get(
+            `http://localhost:5000/api/posts/allReply/${post._id}`,
+            config
+          );
+          commentsCounts[post._id] = response.data.length;
+        })
+      );
+      return commentsCounts;
+    } catch (error) {
+      console.error("Error fetching comments count:", error);
+      throw error;
+    }
+  }
+);
 
 const postSlice = createSlice({
   name: "posts",
   initialState,
-  reducers: {
-    setPosts(state, action) {
-      state.posts = action.payload;
-      state.loading = false;
-      state.error = null;
-    },
-    setLoading(state, action) {
-      state.loading = action.payload;
-    },
-    setError(state, action) {
-      state.error = action.payload;
-      state.loading = false;
-    },
-    addPost(state, action) {
-      state.posts.unshift(action.payload);
-    },
-    toggleLike(state, action) {
-      const { postId, userId } = action.payload;
-      const post = state.posts.find((post) => post._id === postId);
-      if (post) {
-        if (post.likes.includes(userId)) {
-          post.likes = post.likes.filter((id) => id !== userId);
-        } else {
-          post.likes.push(userId);
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchPosts.fulfilled, (state, action) => {
+        state.posts = action.payload;
+      })
+      .addCase(fetchFriendsPost.fulfilled, (state, action) => {
+        state.posts = action.payload;
+      })
+      .addCase(fetchComments.fulfilled, (state, action) => {
+        state.comments[action.payload.postId] = action.payload.comments;
+      })
+      .addCase(handleLike.fulfilled, (state, action) => {
+        const updatedPost = action.payload;
+        const postIndex = state.posts.findIndex(
+          (post) => post._id === updatedPost._id
+        );
+        if (postIndex >= 0) {
+          state.posts[postIndex] = updatedPost;
         }
-      }
-    },
-    addComment(state, action) {
-      const { postId, comment } = action.payload;
-      const post = state.posts.find((post) => post._id === postId);
-      if (post) {
-        post.comments.push(comment);
-      }
-    },
+      })
+      .addCase(fetchCommentsCount.fulfilled, (state, action) => {
+        state.commentsCount = action.payload;
+      });
   },
-  extraReducers:(builder)=>{
-    builder.addCase(fetchPosts.fulfilled, (state, action)=>{
-        state.posts= action.payload.data
-    })
-  }
 });
 
 export const {
