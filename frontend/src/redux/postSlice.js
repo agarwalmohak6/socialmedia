@@ -11,10 +11,11 @@ const initialState = {
   error: null,
 };
 
+const token = localStorage.getItem("token");
+const decoded = jwtDecode(token);
+
 export const fetchPosts = createAsyncThunk("fetchPosts", async () => {
   try {
-    const token = localStorage.getItem("token");
-    const decoded = jwtDecode(token);
     const config = {
       headers: {
         Authorization: token,
@@ -34,8 +35,6 @@ export const fetchPosts = createAsyncThunk("fetchPosts", async () => {
 export const fetchFriendsPost = createAsyncThunk(
   "fetchFriendsPost",
   async () => {
-    const token = localStorage.getItem("token");
-    const decoded = jwtDecode(token);
     const friendsResponse = await axios.get(
       `http://localhost:5000/api/users/friends/${decoded.userId}`,
       {
@@ -64,7 +63,6 @@ export const fetchFriendsPost = createAsyncThunk(
 
 export const handleLike = createAsyncThunk("handleLike", async ({ id }) => {
   try {
-    const token = localStorage.getItem("token");
     const config = {
       headers: {
         Authorization: token,
@@ -86,31 +84,31 @@ export const handleLike = createAsyncThunk("handleLike", async ({ id }) => {
   }
 });
 
-export const fetchComments = createAsyncThunk("posts/fetchComments", async (postId) => {
-  try {
-    const token = localStorage.getItem("token");
-    const config = {
-      headers: {
-        Authorization: token,
-      },
-    };
-    const response = await axios.get(
-      `http://localhost:5000/api/posts/allReply/${postId}`,
-      config
-    );
-    return { postId, comments: response.data };
-  } catch (error) {
-    console.error("Error fetching replies:", error);
-    throw error;
+export const fetchComments = createAsyncThunk(
+  "posts/fetchComments",
+  async (postId) => {
+    try {
+      const config = {
+        headers: {
+          Authorization: token,
+        },
+      };
+      const response = await axios.get(
+        `http://localhost:5000/api/posts/allReply/${postId}`,
+        config
+      );
+      return { postId, comments: response.data };
+    } catch (error) {
+      console.error("Error fetching replies:", error);
+      throw error;
+    }
   }
-});
-
+);
 
 export const fetchCommentsCount = createAsyncThunk(
   "fetchCommentsCount",
   async (posts) => {
     try {
-      const token = localStorage.getItem("token");
       const config = {
         headers: {
           Authorization: token,
