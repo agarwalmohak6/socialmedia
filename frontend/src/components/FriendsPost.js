@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import {
   handleLike,
   fetchCommentsCount,
   fetchFriendsPost,
   fetchComments,
+  addComment,
 } from "../redux/postSlice";
 
 const FriendsPost = () => {
@@ -39,6 +40,12 @@ const FriendsPost = () => {
       ...prevShowComments,
       [postId]: !prevShowComments[postId],
     }));
+  };
+
+  const handleAddComment = async (postId) => {
+    const commentText = prompt("Enter your comment:");
+    if (!commentText) return;
+    dispatch(addComment({ postId, commentText }));
   };
 
   const isPostLikedByUser = (post) => {
@@ -78,7 +85,7 @@ const FriendsPost = () => {
                   )}
                   <button
                     className="comment-button"
-                    // onClick={() => handleAddComment(post._id)}
+                    onClick={() => handleAddComment(post._id)}
                   >
                     Add Comment
                   </button>
@@ -101,7 +108,8 @@ const FriendsPost = () => {
         ))}
         {Object.entries(showComments).map(
           ([postId, isShown]) =>
-            isShown && comments[postId] && (
+            isShown &&
+            comments[postId] && (
               <div key={postId} className="comments-popup">
                 <h2>Comments</h2>
                 {comments[postId].map((comment, index) => (

@@ -1,11 +1,21 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchPosts, handleLike, fetchCommentsCount, fetchComments } from "../redux/postSlice";
+import {
+  fetchPosts,
+  handleLike,
+  fetchCommentsCount,
+  fetchComments,
+  addComment,
+  createPost,
+} from "../redux/postSlice";
 
 const YourPosts = () => {
   const [showComments, setShowComments] = useState({});
+  const [showCreatePost, setShowCreatePost] = useState(false);
+  const [postText, setPostText] = useState("");
+  const [postImage, setPostImage] = useState("");
+
   const token = localStorage.getItem("token");
   const decoded = jwtDecode(token);
   const dispatch = useDispatch();
@@ -28,23 +38,9 @@ const YourPosts = () => {
   };
 
   const handleAddComment = async (postId) => {
-    try {
-      const commentText = prompt("Enter your comment:");
-      if (!commentText) return;
-      const config = {
-        headers: {
-          Authorization: token,
-        },
-      };
-      await axios.post(
-        `http://localhost:5000/api/posts/reply/${postId}`,
-        { text: commentText },
-        config
-      );
-      dispatch(fetchCommentsCount(posts)); // Refresh comments count after adding a comment
-    } catch (error) {
-      console.error("Error adding comment:", error);
-    }
+    const commentText = prompt("Enter your comment:");
+    if (!commentText) return;
+    dispatch(addComment({ postId, commentText }));
   };
 
   const handleShowComments = (postId) => {
@@ -57,14 +53,61 @@ const YourPosts = () => {
     }));
   };
 
+  const handleCreatePost = () => {
+    setShowCreatePost(true);
+  };
+
+  const handleSubmitPost = async () => {
+    if (!postText) {
+      alert("Post text is required");
+      return;
+    }
+    await dispatch(createPost({ text: postText, img: postImage }));
+    setShowCreatePost(false);
+    setPostText("");
+    setPostImage("");
+    dispatch(fetchPosts());
+  };
+
   const isPostLikedByUser = (post) => {
-    return post.likes.includes(decoded.userId);
+    return post.likes && post.likes.includes(decoded.userId);
   };
 
   return (
     <div className="posts-page">
       <div className="post-container">
         <h1 className="page-title">Your Posts</h1>
+        <button className="create-post-button" onClick={handleCreatePost}>
+          Create Post
+        </button>
+
+        {showCreatePost && (
+          <div className="create-post-form">
+            <textarea
+              value={postText}
+              onChange={(e) => setPostText(e.target.value)}
+              placeholder="Enter your post text"
+              required
+              className="post-textarea"
+            />
+            <input
+              type="text"
+              value={postImage}
+              onChange={(e) => setPostImage(e.target.value)}
+              placeholder="Enter image URL (optional)"
+              className="post-input"
+            />
+            <button className="submit-post-button" onClick={handleSubmitPost}>
+              Create
+            </button>
+            <button
+              className="submit-close-button"
+              onClick={() => setShowCreatePost(false)}
+            >
+              Close
+            </button>
+          </div>
+        )}
         {posts.map((post) => (
           <div key={post._id} className="post">
             {post.img && (
@@ -106,7 +149,9 @@ const YourPosts = () => {
                   </button>
                 </div>
                 <div className="post-stats">
-                  <p className="likes-count">{post.likes.length} Likes</p>
+                  <p className="likes-count">
+                    {post.likes ? post.likes.length : 0} Likes
+                  </p>
                   <p className="comments-count">
                     {commentsCount[post._id] || 0} Comments
                   </p>
@@ -117,13 +162,12 @@ const YourPosts = () => {
         ))}
         {Object.entries(showComments).map(
           ([postId, isShown]) =>
-            isShown && comments[postId] && (
+            isShown &&
+            comments[postId] && (
               <div key={postId} className="comments-popup">
                 <h2>Comments</h2>
-                {comments[postId].map((comment, index) => (
-                  <div key={index} className="comment">
-                    <p>{comment.text}</p>
-                  </div>
+                {comments[postId].map((comment) => (
+                  <p key={comment._id}>{comment.text}</p>
                 ))}
                 <button
                   className="close-popup"

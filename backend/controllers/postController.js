@@ -148,6 +148,11 @@ const getAllReplies = async (req, res) => {
   try {
     const { id } = req.params;
 
+    if (!id) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "Invalid post ID" });
+    }
     // Find the post by its ID
     const post = await Post.findById(id);
 
