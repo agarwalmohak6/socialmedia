@@ -32,6 +32,7 @@ function ResponsiveAppBar() {
   if (token) {
     pages.push({ name: "About", path: "/about" });
     pages.push({ name: "Posts", path: "/postsPage" });
+    pages.push({ name: "Create Post", path: "/createPost" });
     pages.push({ name: "Logout", path: "/login" });
   } else {
     pages.push({ name: "Home", path: "/" });

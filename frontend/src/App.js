@@ -7,6 +7,7 @@ import Contact from "./components/Contact";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import PostsPage from "./components/PostsPage";
+import CreatePost from "./components/CreatePost";
 
 function App() {
   return (
@@ -63,6 +64,15 @@ function App() {
             <>
               <ResponsiveAppBar />
               <PostsPage />
+            </>
+          }
+        />
+        <Route
+          path="/createPost"
+          element={
+            <>
+              <ResponsiveAppBar />
+              <CreatePost />
             </>
           }
         />
