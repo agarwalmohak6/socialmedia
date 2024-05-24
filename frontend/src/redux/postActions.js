@@ -3,7 +3,7 @@ import { jwtDecode } from "jwt-decode";
 import axiosInstance from "../helper/axiosInstance";
 
 const token = localStorage.getItem("token");
-const decoded = token ? jwtDecode(token) : {};
+const decoded = jwtDecode(token);
 
 export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
   try {

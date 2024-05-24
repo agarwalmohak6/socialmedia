@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import {
   handleLike,
   fetchComments,
   addComment,
-  fetchCommentsCount
+  fetchCommentsCount,
 } from "../redux/postActions.js";
 
 const PostList = ({ fetchPosts }) => {
   const [showComments, setShowComments] = useState({});
   const token = localStorage.getItem("token");
-  const decoded = jwtDecode(token);
+  const decoded =jwtDecode(token);
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.posts.posts);
   const commentsCount = useSelector((state) => state.posts.commentsCount);
@@ -48,7 +48,10 @@ const PostList = ({ fetchPosts }) => {
   };
 
   const isPostLikedByUser = (post) => {
-    return post.likes.includes(decoded.userId);
+    if (!post.likes || !Array.isArray(post.likes)) {
+      return false;
+    }
+    return post.likes.includes(decoded?.userId);
   };
 
   return (
@@ -92,7 +95,7 @@ const PostList = ({ fetchPosts }) => {
                 </button>
               </div>
               <div className="post-stats">
-                <p className="likes-count">{post.likes.length} Likes</p>
+                <p className="likes-count">{post.likes?.length || 0} Likes</p>
                 <p className="comments-count">
                   {commentsCount[post._id] || 0} Comments
                 </p>
