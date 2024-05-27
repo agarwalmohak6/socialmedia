@@ -9,6 +9,7 @@ import Register from "./components/Register";
 import PostsPage from "./components/PostsPage";
 import CreatePost from "./components/CreatePost";
 import Chat from "./components/Chat";
+import GetFriends from "./components/GetFriends";
 
 function App() {
   return (
@@ -74,6 +75,15 @@ function App() {
             <>
               <ResponsiveAppBar />
               <CreatePost />
+            </>
+          }
+        />
+        <Route
+          path="/friends"
+          element={
+            <>
+              <ResponsiveAppBar />
+              <GetFriends />
             </>
           }
         />

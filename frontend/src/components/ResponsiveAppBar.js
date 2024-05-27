@@ -33,6 +33,7 @@ function ResponsiveAppBar() {
     pages.push({ name: "Posts", path: "/postsPage" });
     pages.push({ name: "Chat", path: "/chat" });
     pages.push({ name: "Create Post", path: "/createPost" });
+    pages.push({ name: "Your Friends", path: "/friends" });
     pages.push({ name: "About", path: "/about" });
     pages.push({ name: "Logout", path: "/login" });
   } else {
