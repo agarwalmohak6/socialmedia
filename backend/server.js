@@ -1,4 +1,3 @@
-// Importing necessary modules/packages
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -20,7 +19,7 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000", // Adjust as needed for security
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   },
 });
@@ -28,30 +27,46 @@ const io = new Server(server, {
 // Define port for the server to listen on
 const PORT = process.env.PORT;
 
-// Middlewares -> that run between request and response
-app.use(express.json()); // to handle JSON parsing
-app.use(express.urlencoded({ extended: true })); // to handle URL-encoded data
-app.use(cookieParser()); // to get cookies from req and set cookie in res
+// Middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(cors());
 
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 
-// Socket.io connection event
+// Socket.io connection and events begin
 io.on("connection", (socket) => {
   console.log("a user connected");
+  // Handle room joining
+  socket.on("joinRoom", (room) => {
+    socket.join(room);
+    console.log(`User joined room: ${room}`);
+    socket.to(room).emit("userJoinedRoom", room);
+  });
+  // Handle room leaving
+  socket.on("leaveRoom", (room) => {
+    socket.leave(room);
+    console.log(`User left room: ${room}`);
+    socket.to(room).emit("userLeftRoom", room);
+  });
   // Handle message event from client
-  socket.on("message", (data) => {
-    console.log("message received: ", data);
-    // Broadcast the message to all connected clients
-    io.emit("messageResponse", data);
+  socket.on("message", ({ room, message }) => {
+    console.log(`message received${room ? ` in room ${room}` : ""}: `, message);
+    if (room) {
+      io.to(room).emit("messageResponse", message); // send message to room
+    } else {
+      io.emit("messageResponse", message); // if no room found, then broadcast
+    }
   });
   // Handle disconnection
   socket.on("disconnect", (reason) => {
     console.log(`user disconnected: ${reason}`);
   });
 });
+// Socket.io connection and events closed
 
 // Make the server listen
 app.listen(PORT, () => {

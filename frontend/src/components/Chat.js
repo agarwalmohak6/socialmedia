@@ -1,4 +1,3 @@
-// src/components/Chat.js
 import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
 
@@ -7,6 +6,8 @@ const Chat = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [room, setRoom] = useState("");
+  const [joinedRoom, setJoinedRoom] = useState("");
 
   useEffect(() => {
     if (socket) {
@@ -27,20 +28,32 @@ const Chat = () => {
         console.log(`Disconnected: ${reason}`);
       });
 
+      // Listen for join and leave notifications
+      socket.on("userJoinedRoom", (room) => {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          `User joined room: ${room}`,
+        ]);
+      });
+      socket.on("userLeftRoom", (room) => {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          `User left room: ${room}`,
+        ]);
+      });
+
       return () => {
         socket.off("messageResponse");
         socket.off("connect");
         socket.off("disconnect");
+        socket.off("userJoinedRoom");
+        socket.off("userLeftRoom");
       };
     }
   }, [socket]);
 
   const connectSocket = () => {
-    const newSocket = io("http://localhost:4000", {
-      autoConnect: false, // Prevent auto connection
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-    });
+    const newSocket = io("http://localhost:4000");
     newSocket.connect();
     setSocket(newSocket);
   };
@@ -49,12 +62,31 @@ const Chat = () => {
     if (socket) {
       socket.disconnect();
       setSocket(null);
+      setJoinedRoom("");
+    }
+  };
+
+  const joinRoom = () => {
+    if (socket && room.trim() !== "") {
+      socket.emit("joinRoom", room);
+      setJoinedRoom(room);
+    }
+  };
+
+  const leaveRoom = () => {
+    if (socket && joinedRoom) {
+      socket.emit("leaveRoom", joinedRoom);
+      setJoinedRoom("");
     }
   };
 
   const sendMessage = () => {
     if (message.trim() !== "" && socket) {
-      socket.emit("message", message);
+      if (joinedRoom !== "") {
+        socket.emit("message", { room: joinedRoom, message });
+      } else {
+        socket.emit("message", { room: null, message });
+      }
       setMessage("");
     }
   };
@@ -67,6 +99,27 @@ const Chat = () => {
         </button>
         <button onClick={disconnectSocket} disabled={!isConnected}>
           Disconnect
+        </button>
+      </div>
+      <div className="room-input">
+        <input
+          type="text"
+          value={room}
+          onChange={(e) => setRoom(e.target.value)}
+          placeholder="Enter room name"
+          disabled={!isConnected || joinedRoom !== ""}
+        />
+        <button
+          onClick={joinRoom}
+          disabled={!isConnected || room.trim() === "" || joinedRoom !== ""}
+        >
+          Join Room
+        </button>
+        <button
+          onClick={leaveRoom}
+          disabled={!isConnected || joinedRoom === ""}
+        >
+          Leave Room
         </button>
       </div>
       <div className="messages">
