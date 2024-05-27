@@ -96,6 +96,15 @@ function App() {
             </>
           }
         />
+        <Route
+          path="/chat/:roomname"
+          element={
+            <>
+              <ResponsiveAppBar />
+              <Chat />
+            </>
+          }
+        />
         {/* Add more routes as needed */}
       </Routes>
     </>

@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 const GetFriends = () => {
   const [friends, setFriends] = useState([]);
   const token = localStorage.getItem("token");
+  const curr_name = localStorage.getItem("username");
   const decoded = jwtDecode(token);
+  console.log(decoded);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -22,6 +26,11 @@ const GetFriends = () => {
     fetchFriends();
   }, [decoded]);
 
+  const handleAddFriend = (friendUsername) => {
+    const roomName = `${curr_name}_${friendUsername}`;
+    navigate(`/chat/${roomName}`);
+  };
+
   return (
     <div className="friends-list">
       <h2>Friends</h2>
@@ -32,6 +41,12 @@ const GetFriends = () => {
               <span className="friend-name">{friend.name}</span>
               <span className="friend-username">@{friend.username}</span>
             </div>
+            <button
+              onClick={() => handleAddFriend(friend.username)}
+              className="add-friend-button"
+            >
+              Add Friend
+            </button>
           </li>
         ))}
       </ul>
