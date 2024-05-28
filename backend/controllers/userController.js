@@ -91,41 +91,38 @@ const logoutUser = async (req, res) => {
 const followUnfollowUser = async (req, res) => {
   try {
     const { id } = req.params;
-    await validateFriend(req.body);
-    const userToModify = await User.findById(id); // user to follow or unfollow
-    const currentUser= req.user._id.toString();  // logged in user
-    checkUserExist(userToModify, res);
-    if (userToModify._id.equals(currentUser._id)) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "You can't follow / unfollow yourself" });
+    const currentUser = req.user._id; // Assuming req.user is set via middleware
+    
+    const userToModify = await User.findById(id);
+    if (!userToModify) {
+      return res.status(404).json({ message: "User not found" });
     }
+    if (userToModify._id.equals(currentUser)) {
+      return res.status(400).json({ message: "You can't follow/unfollow yourself" });
+    }
+
     const existingFriendship = await Friend.findOne({
-      followRequestBy: currentUser._id,
+      followRequestBy: currentUser,
       followRequestTo: userToModify._id,
     });
+    
     if (existingFriendship) {
-      await Friend.deleteOne(existingFriendship); 
-      res
-        .status(StatusCodes.OK)
-        .json({ message: "User unfollowed successfully" });
+      await Friend.deleteOne({ _id: existingFriendship._id });
+      res.status(200).json({ message: "User unfollowed successfully" });
     } else {
       const newFriendship = new Friend({
-        followRequestBy: currentUser._id,
+        followRequestBy: currentUser,
         followRequestTo: userToModify._id,
       });
       await newFriendship.save();
-      res
-        .status(StatusCodes.OK)
-        .json({ message: "User followed successfully" });
+      res.status(200).json({ message: "User followed successfully" });
     }
   } catch (error) {
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: error.message });
     console.log("Error while following/unfollowing user:", error.message);
+    res.status(500).json({ message: error.message });
   }
 };
+
 
 const updateUser = async (req, res) => {
   const { name, username, email, password, profilePic, bio } = req.body;

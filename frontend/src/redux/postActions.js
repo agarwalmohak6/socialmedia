@@ -3,11 +3,11 @@ import { jwtDecode } from "jwt-decode";
 import axiosInstance from "../helper/axiosInstance";
 
 const token = localStorage.getItem("token");
-const decoded = jwtDecode(token);
+const decoded = token ? jwtDecode(token) : {};
 
 export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
   try {
-    const response = await axiosInstance.get(`/posts/all/${decoded.userId}`);
+    const response = await axiosInstance.get(`/posts/all/${decoded?.userId}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching posts:", error);
