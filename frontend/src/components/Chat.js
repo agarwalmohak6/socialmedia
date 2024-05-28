@@ -15,30 +15,27 @@ const Chat = () => {
     const newSocket = io("http://localhost:4000");
     setSocket(newSocket);
 
-    // Listen for incoming messages
     newSocket.on("messageResponse", (message) => {
       setMessages((prevMessages) => [...prevMessages, message]);
     });
 
-    // Handle connection
     newSocket.on("connect", () => {
       setIsConnected(true);
       console.log("Connected to server");
     });
 
-    // Handle disconnection
     newSocket.on("disconnect", (reason) => {
       setIsConnected(false);
       console.log(`Disconnected: ${reason}`);
     });
 
-    // Listen for join and leave notifications
     newSocket.on("userJoinedRoom", (room) => {
       setMessages((prevMessages) => [
         ...prevMessages,
         `User joined room: ${room}`,
       ]);
     });
+
     newSocket.on("userLeftRoom", (room) => {
       setMessages((prevMessages) => [
         ...prevMessages,
@@ -83,47 +80,56 @@ const Chat = () => {
 
   return (
     <div className="chat-container">
-      <div className="room-input">
-        {!roomname && (
-          <>
-            <input
-              type="text"
-              value={room}
-              onChange={(e) => setRoom(e.target.value)}
-              placeholder="Enter room name"
-              disabled={!isConnected || joinedRoom !== ""}
-            />
-            <button
-              onClick={joinRoom}
-              disabled={!isConnected || room.trim() === "" || joinedRoom !== ""}
-            >
-              Join Room
-            </button>
-          </>
-        )}
+      <div className="side-panel">
+        <div className="room-input">
+          {!roomname && (
+            <>
+              <input
+                type="text"
+                value={room}
+                onChange={(e) => setRoom(e.target.value)}
+                placeholder="Enter room name"
+                disabled={!isConnected || joinedRoom !== ""}
+              />
+              <button
+                onClick={joinRoom}
+                disabled={!isConnected || room.trim() === "" || joinedRoom !== ""}
+              >
+                Join Room
+              </button>
+            </>
+          )}
+        </div>
+        <div className="room-list">
+          {/* Room list items can be rendered here */}
+        </div>
       </div>
-      <div className="messages">
-        {messages.map((msg, index) => (
-          <div key={index} className="message">
-            {msg}
-          </div>
-        ))}
+      <div className="chat-area">
+        <div className="messages">
+          {messages.map((msg, index) => (
+            <div key={index} className="message">
+              {msg}
+            </div>
+          ))}
+        </div>
+        <div className="chat-input-container">
+          <input
+            type="text"
+            className="chat-input"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Type a message"
+            disabled={!isConnected}
+          />
+          <button
+            className="chat-button"
+            onClick={sendMessage}
+            disabled={!isConnected}
+          >
+            Send
+          </button>
+        </div>
       </div>
-      <input
-        type="text"
-        className="chat-input"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        placeholder="Type a message"
-        disabled={!isConnected}
-      />
-      <button
-        className="chat-button"
-        onClick={sendMessage}
-        disabled={!isConnected}
-      >
-        Send
-      </button>
     </div>
   );
 };

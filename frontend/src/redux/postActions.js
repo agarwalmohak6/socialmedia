@@ -1,16 +1,14 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { jwtDecode } from "jwt-decode";
 import axiosInstance from "../helper/axiosInstance";
-
-const token = localStorage.getItem("token");
-const decoded = token ? jwtDecode(token) : {};
+import { getDecodedval } from "../helper/userHelper";
 
 export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
   try {
+    const decoded= getDecodedval();
     const response = await axiosInstance.get(`/posts/all/${decoded?.userId}`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching posts:", error);
+    console.log("Error fetching posts:", error);
     throw error;
   }
 });
@@ -19,6 +17,7 @@ export const fetchFriendsPost = createAsyncThunk(
   "posts/fetchFriendsPost",
   async () => {
     try {
+      const decoded= getDecodedval();
       const friendsResponse = await axiosInstance.get(
         `/users/friends/${decoded.userId}`
       );
@@ -35,7 +34,7 @@ export const fetchFriendsPost = createAsyncThunk(
 
       return postsData;
     } catch (error) {
-      console.error("Error fetching friends' posts:", error);
+      console.log("Error fetching friends' posts:", error);
       throw error;
     }
   }
@@ -51,7 +50,7 @@ export const handleLike = createAsyncThunk(
 
       return updatedPostResponse.data;
     } catch (error) {
-      console.error("Error liking/unliking post:", error);
+      console.log("Error liking/unliking post:", error);
       throw error;
     }
   }
@@ -64,7 +63,7 @@ export const fetchComments = createAsyncThunk(
       const response = await axiosInstance.get(`/posts/allReply/${postId}`);
       return { postId, comments: response.data };
     } catch (error) {
-      console.error("Error fetching replies:", error);
+      console.log("Error fetching replies:", error);
       throw error;
     }
   }
@@ -85,7 +84,7 @@ export const fetchCommentsCount = createAsyncThunk(
       );
       return commentsCounts;
     } catch (error) {
-      console.error("Error fetching comments count:", error);
+      console.log("Error fetching comments count:", error);
       throw error;
     }
   }
@@ -100,7 +99,7 @@ export const addComment = createAsyncThunk(
       });
       return { postId, comment: response.data };
     } catch (error) {
-      console.error("Error adding comment:", error);
+      console.log("Error adding comment:", error);
       throw error;
     }
   }
@@ -113,7 +112,7 @@ export const createPost = createAsyncThunk(
       const response = await axiosInstance.post(`/posts/create`, { text, img });
       return response.data;
     } catch (error) {
-      console.error("Error creating post:", error);
+      console.log("Error creating post:", error);
       throw error;
     }
   }

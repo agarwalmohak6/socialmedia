@@ -6,7 +6,6 @@ import { config } from "dotenv";
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/UserRoutes.js";
 import postRoutes from "./routes/PostRoutes.js";
-import chatRoutes from "./routes/ChatRoutes.js"
 import cors from "cors";
 
 // Configuring .env
@@ -37,7 +36,6 @@ app.use(cors());
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
-app.use("/api/chatRooms", chatRoutes);
 
 // Socket.io connection and events begin
 io.on("connection", (socket) => {

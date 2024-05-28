@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../helper/axiosInstance";
 
@@ -9,7 +10,6 @@ const GetFriends = () => {
   const [addFriend, setAddFriend] = useState("");
   const token = localStorage.getItem("token");
   const curr_name = localStorage.getItem("username");
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const decoded = token ? jwtDecode(token) : {};
 
   const navigate = useNavigate();
@@ -25,18 +25,13 @@ const GetFriends = () => {
         console.error("Error fetching friends:", error);
       }
     };
-
     fetchFriends();
   }, [decoded]);
 
   const handleChatFriend = async (friendUsername) => {
-    const roomName = `${curr_name}_${friendUsername}`;
-
     try {
-      await axios.post("http://localhost:5000/api/chatRooms/create", {
-        roomname: roomName,
-      });
-
+      const usernames = [curr_name, friendUsername].sort();
+      const roomName = `${usernames[0]}_${usernames[1]}`;
       navigate(`/chat/${roomName}`);
     } catch (error) {
       console.error("Error creating chat room:", error);
@@ -45,13 +40,24 @@ const GetFriends = () => {
 
   const handleAddFriend = async (username) => {
     try {
-      const res1 = await axios.get(`http://localhost:5000/api/users/profile/${username}`);
+      const res1 = await axios.get(
+        `http://localhost:5000/api/users/profile/${username}`
+      );
       console.log(res1);
       if (res1.data) {
-        const response = await axiosInstance.post(`/users/follow/${res1.data._id}`);
+        const response = await axiosInstance.post(
+          `/users/follow/${res1.data._id}`
+        );
         console.log(response);
         if (response.status === 200) {
-          setFriends((prevFriends) => [...prevFriends, { id: res1.data._id, name: res1.data.name, username: res1.data.username }]);
+          setFriends((prevFriends) => [
+            ...prevFriends,
+            {
+              id: res1.data._id,
+              name: res1.data.name,
+              username: res1.data.username,
+            },
+          ]);
           setAddFriend("");
         }
       }
@@ -70,7 +76,9 @@ const GetFriends = () => {
           setAddFriend(e.target.value);
         }}
       />
-      <button onClick={() => handleAddFriend(addFriend)}>Add/Remove Friend</button>
+      <button onClick={() => handleAddFriend(addFriend)}>
+        Add/Remove Friend
+      </button>
       <h2>Friends</h2>
       <ul>
         {friends.map((friend) => (

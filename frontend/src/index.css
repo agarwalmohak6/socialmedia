@@ -439,41 +439,6 @@ a {
   background-color: #e63900;
 }
 
-/* Chat CSS */
-.chat-container {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  width: 300px;
-  max-height: 400px;
-  background-color: white;
-  border: 1px solid #ccc;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-}
-.messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-}
-.message {
-  margin-bottom: 0.5rem;
-}
-input.chat-input {
-  border: 1px solid #ccc;
-  padding: 0.5rem;
-  width: calc(100% - 1rem);
-  margin: 0.5rem;
-}
-button.chat-button {
-  border: none;
-  background-color: #61dafb;
-  padding: 0.5rem;
-  cursor: pointer;
-  margin: 0.5rem;
-}
-
 /* Get Friends CSS */
 .friends-list {
   max-width: 600px;
@@ -548,4 +513,95 @@ button.chat-button {
 }
 .add-friend-button:hover {
   background-color: #0056b3;
+}
+
+/* Chat CSS */
+/* chat.css */
+
+.chat-container {
+  display: flex;
+  height: 91vh;
+  font-family: Arial, sans-serif;
+}
+.side-panel {
+  width: 25%;
+  background-color: #f0f0f0;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+.room-input {
+  margin-bottom: 20px;
+}
+.room-input input {
+  width: calc(100% - 80px);
+  padding: 15px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.room-input button {
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  margin-top: 5px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.room-input button:disabled {
+  background-color: #c0c0c0;
+}
+
+.room-list {
+  margin-top: 20px;
+}
+
+.chat-area {
+  width: 75%;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+}
+
+.messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  border-bottom: 1px solid #ccc;
+}
+
+.message {
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #f1f1f1;
+  border-radius: 4px;
+}
+
+.chat-input-container {
+  display: flex;
+  padding: 20px;
+  border-top: 1px solid #ccc;
+  background-color: #f9f9f9;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.chat-button {
+  padding: 10px 20px;
+  margin-left: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.chat-button:disabled {
+  background-color: #c0c0c0;
 }
