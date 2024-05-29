@@ -3,7 +3,6 @@ import { Route, Routes } from "react-router-dom";
 import ResponsiveAppBar from "./components/ResponsiveAppBar";
 import Home from "./components/Home";
 import About from "./components/About";
-import Contact from "./components/Contact";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import PostsPage from "./components/PostsPage";
@@ -30,15 +29,6 @@ function App() {
             <>
               <ResponsiveAppBar />
               <About />
-            </>
-          }
-        />
-        <Route
-          path="/contact"
-          element={
-            <>
-              <ResponsiveAppBar />
-              <Contact />
             </>
           }
         />

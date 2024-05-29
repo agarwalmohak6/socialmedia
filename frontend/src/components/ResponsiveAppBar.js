@@ -38,7 +38,6 @@ function ResponsiveAppBar() {
     pages.push({ name: "Logout", path: "/login" });
   } else {
     pages.push({ name: "Home", path: "/" });
-    pages.push({ name: "Contact", path: "/contact" });
     pages.push({ name: "Login", path: "/login" });
     pages.push({ name: "Register", path: "/register" });
   }
