@@ -98,146 +98,6 @@ a {
 }
 
 /* Posts Page CSS */
-/* 
-.posts-page {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: #f9f9f9;
-}
-
-.page-title {
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 2rem;
-  color: #333;
-}
-
-.post-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  align-items: center;
-}
-
-.post {
-  background-color: #fff;
-  border-radius: 16px;
-  border: 1px solid #eee;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  width: 100%;
-}
-
-.post-image {
-  width: 100%;
-  height: auto;
-  max-height: 250px;
-  object-fit: cover;
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
-}
-
-.post-content {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.post-text {
-  margin-bottom: 15px;
-  font-size: 1.2rem;
-  text-align: center;
-  color: #333;
-}
-
-.post-details {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 10px;
-}
-
-.post-created-at {
-  font-size: 0.9rem;
-  color: #777;
-  margin-bottom: 10px;
-}
-
-.post-actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 15px;
-}
-
-.like-button,
-.comment-button,
-.show-comments-button {
-  background-color: #6ab04c;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 10px 20px;
-  cursor: pointer;
-  margin: 0 10px;
-  transition: background-color 0.3s;
-}
-
-.like-button:hover,
-.comment-button:hover,
-.show-comments-button:hover {
-  background-color: #4c9945;
-}
-
-.likes-count,
-.comments-count {
-  font-size: 1rem;
-  color: #555;
-  margin-top: 5px;
-}
-
-.post-stats {
-  display: flex;
-  align-items: center;
-  margin-top: 5px;
-}
-
-.comments-popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.comment {
-  margin-bottom: 10px;
-}
-
-.close-popup {
-  background-color: #ff4500;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 10px 20px;
-  cursor: pointer;
-  margin-top: 10px;
-  transition: background-color 0.3s;
-}
-
-.close-popup:hover {
-  background-color: #e63900;
-} */
-
 .posts-page {
   max-width: 800px;
   margin: 0 auto;
@@ -409,15 +269,18 @@ a {
   margin-top: 5px;
 }
 
-.comments-popup {
+.comments-side-panel {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100%;
   background-color: #fff;
-  border-radius: 8px;
+  border-left: 1px solid #eee;
+  box-shadow: -2px 0 6px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  z-index: 1000;
   padding: 20px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .comment {
@@ -437,6 +300,33 @@ a {
 
 .close-popup:hover {
   background-color: #e63900;
+}
+
+.add-comment-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.add-comment-section input {
+  flex-grow: 1;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.add-comment-section button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+}
+
+.add-comment-section button:hover {
+  background-color: #0056b3;
 }
 
 /* Get Friends CSS */
