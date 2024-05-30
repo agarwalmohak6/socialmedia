@@ -90,18 +90,18 @@ const GetFriends = () => {
               <span className="friend-name">{friend.name}</span>
               <span className="friend-username">@{friend.username}</span>
             </div>
+            <div>
             <button
               onClick={() => handleAddFriend(friend.username)}
-              className="remove-friend-button"
             >
               Remove Friend
             </button>
             <button
               onClick={() => handleChatFriend(friend.username)}
-              className="add-friend-button"
             >
               Chat
             </button>
+            </div>
           </li>
         ))}
       </ul>

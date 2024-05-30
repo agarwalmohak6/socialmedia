@@ -331,7 +331,7 @@ a {
 
 /* Get Friends CSS */
 .friends-list {
-  max-width: 600px;
+  max-width: 700px;
   margin: 0 auto;
   padding: 20px;
   background: #f7f7f7;
@@ -411,42 +411,7 @@ a {
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.add-friend-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-}
-
-.add-friend-button:hover {
-  background-color: #0056b3;
-  transform: translateY(-2px);
-}
-
-.remove-friend-button {
-  background-color: rgb(228, 40, 40);
-  color: white;
-  border: none;
-}
-
-.remove-friend-button:hover {
-  background-color: rgb(200, 35, 35);
-  transform: translateY(-2px);
-}
-
-.chat-friend-button {
-  background-color: #17a2b8;
-  color: white;
-  border: none;
-}
-
-.chat-friend-button:hover {
-  background-color: #138496;
-  transform: translateY(-2px);
-}
-
-
 /* Chat CSS */
-/* chat.css */
 
 .chat-container {
   display: flex;
