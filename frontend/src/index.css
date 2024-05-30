@@ -338,12 +338,14 @@ a {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
 .friends-list h2 {
   text-align: center;
   color: #333;
   margin-bottom: 20px;
   font-family: "Arial", sans-serif;
 }
+
 .friends-list input[name="addFriend"] {
   width: calc(100% - 120px);
   padding: 10px;
@@ -352,25 +354,31 @@ a {
   border-radius: 5px;
   font-size: 16px;
   font-family: "Arial", sans-serif;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
 .friends-list button {
+  margin-left: 10px;
   padding: 10px 20px;
-  background-color: #5cb85c;
+  background-color: #28a745;
   color: white;
   border: none;
   border-radius: 5px;
-  font-size: 16px;
   cursor: pointer;
-  font-family: "Arial", sans-serif;
-  transition: background-color 0.3s ease;
+  font-size: 16px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
+
 .friends-list button:hover {
-  background-color: #4cae4c;
+  background-color: #218838;
+  transform: translateY(-2px);
 }
+
 .friends-list ul {
   list-style-type: none;
   padding: 0;
 }
+
 .friend-item {
   display: flex;
   justify-content: space-between;
@@ -381,29 +389,61 @@ a {
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
 .friend-info {
   display: flex;
   flex-direction: column;
 }
+
 .friend-name {
   font-weight: bold;
   color: #333;
 }
+
 .friend-username {
   color: #777;
 }
+
+.add-friend-button, .remove-friend-button, .chat-friend-button {
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
 .add-friend-button {
   background-color: #007bff;
   color: white;
   border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
 }
+
 .add-friend-button:hover {
   background-color: #0056b3;
+  transform: translateY(-2px);
 }
+
+.remove-friend-button {
+  background-color: rgb(228, 40, 40);
+  color: white;
+  border: none;
+}
+
+.remove-friend-button:hover {
+  background-color: rgb(200, 35, 35);
+  transform: translateY(-2px);
+}
+
+.chat-friend-button {
+  background-color: #17a2b8;
+  color: white;
+  border: none;
+}
+
+.chat-friend-button:hover {
+  background-color: #138496;
+  transform: translateY(-2px);
+}
+
 
 /* Chat CSS */
 /* chat.css */

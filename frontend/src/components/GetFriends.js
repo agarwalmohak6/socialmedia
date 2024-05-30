@@ -44,7 +44,10 @@ const GetFriends = () => {
         `http://localhost:5000/api/users/profile/${username}`
       );
       console.log(res1);
-      if (res1.data) {
+      if (!res1.data) {
+        alert("User not found");
+        setAddFriend("");
+      } else {
         const response = await axiosInstance.post(
           `/users/follow/${res1.data._id}`
         );
@@ -77,7 +80,7 @@ const GetFriends = () => {
         }}
       />
       <button onClick={() => handleAddFriend(addFriend)}>
-        Add/Remove Friend
+        Add Friend
       </button>
       <h2>Friends</h2>
       <ul>
@@ -87,6 +90,12 @@ const GetFriends = () => {
               <span className="friend-name">{friend.name}</span>
               <span className="friend-username">@{friend.username}</span>
             </div>
+            <button
+              onClick={() => handleAddFriend(friend.username)}
+              className="remove-friend-button"
+            >
+              Remove Friend
+            </button>
             <button
               onClick={() => handleChatFriend(friend.username)}
               className="add-friend-button"

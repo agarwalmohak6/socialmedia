@@ -92,20 +92,22 @@ const followUnfollowUser = async (req, res) => {
   try {
     const { id } = req.params;
     const currentUser = req.user._id; // Assuming req.user is set via middleware
-    
+
     const userToModify = await User.findById(id);
     if (!userToModify) {
       return res.status(404).json({ message: "User not found" });
     }
     if (userToModify._id.equals(currentUser)) {
-      return res.status(400).json({ message: "You can't follow/unfollow yourself" });
+      return res
+        .status(400)
+        .json({ message: "You can't follow/unfollow yourself" });
     }
 
     const existingFriendship = await Friend.findOne({
       followRequestBy: currentUser,
       followRequestTo: userToModify._id,
     });
-    
+
     if (existingFriendship) {
       await Friend.deleteOne({ _id: existingFriendship._id });
       res.status(200).json({ message: "User unfollowed successfully" });
@@ -122,7 +124,6 @@ const followUnfollowUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 const updateUser = async (req, res) => {
   const { name, username, email, password, profilePic, bio } = req.body;
@@ -161,7 +162,7 @@ const getUserProfile = async (req, res) => {
     let user = await User.findOne({ username })
       .select("-password")
       .select("-updatedAt");
-    checkUserExist(user, res);
+    if (user) checkUserExist(user, res);
     return res.status(StatusCodes.OK).json(user);
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
