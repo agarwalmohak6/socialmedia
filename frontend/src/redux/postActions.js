@@ -4,7 +4,7 @@ import { getDecodedval } from "../helper/userHelper";
 
 export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
   try {
-    const decoded= getDecodedval();
+    const decoded = getDecodedval();
     const response = await axiosInstance.get(`/posts/all/${decoded?.userId}`);
     return response.data.reverse();
   } catch (error) {
@@ -17,7 +17,7 @@ export const fetchFriendsPost = createAsyncThunk(
   "posts/fetchFriendsPost",
   async () => {
     try {
-      const decoded= getDecodedval();
+      const decoded = getDecodedval();
       const friendsResponse = await axiosInstance.get(
         `/users/friends/${decoded.userId}`
       );

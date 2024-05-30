@@ -79,9 +79,7 @@ const GetFriends = () => {
           setAddFriend(e.target.value);
         }}
       />
-      <button onClick={() => handleAddFriend(addFriend)}>
-        Add Friend
-      </button>
+      <button onClick={() => handleAddFriend(addFriend)}>Add Friend</button>
       <h2>Friends</h2>
       <ul>
         {friends.map((friend) => (
@@ -91,16 +89,12 @@ const GetFriends = () => {
               <span className="friend-username">@{friend.username}</span>
             </div>
             <div>
-            <button
-              onClick={() => handleAddFriend(friend.username)}
-            >
-              Remove Friend
-            </button>
-            <button
-              onClick={() => handleChatFriend(friend.username)}
-            >
-              Chat
-            </button>
+              <button onClick={() => handleAddFriend(friend.username)}>
+                Remove Friend
+              </button>
+              <button onClick={() => handleChatFriend(friend.username)}>
+                Chat
+              </button>
             </div>
           </li>
         ))}

@@ -404,7 +404,9 @@ a {
   color: #777;
 }
 
-.add-friend-button, .remove-friend-button, .chat-friend-button {
+.add-friend-button,
+.remove-friend-button,
+.chat-friend-button {
   padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
