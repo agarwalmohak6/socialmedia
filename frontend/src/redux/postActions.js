@@ -6,7 +6,7 @@ export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
   try {
     const decoded= getDecodedval();
     const response = await axiosInstance.get(`/posts/all/${decoded?.userId}`);
-    return response.data;
+    return response.data.reverse();
   } catch (error) {
     console.log("Error fetching posts:", error);
     throw error;
@@ -28,7 +28,7 @@ export const fetchFriendsPost = createAsyncThunk(
       for (const friend of friends) {
         const response = await axiosInstance.get(`/posts/all/${friend.id}`);
         if (response.data) {
-          postsData.push(...response.data);
+          postsData.push(...response.data.reverse());
         }
       }
 
