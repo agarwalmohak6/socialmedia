@@ -12,6 +12,7 @@ import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import * as yup from "yup";
+import { Toaster, toast } from "react-hot-toast";
 
 const defaultTheme = createTheme();
 
@@ -45,6 +46,7 @@ export default function LoginPage() {
         formData
       );
       if (response.status === 200) {
+        toast.success("Logged in successfully");
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("username", response.data.username);
         navigate("/postsPage");
@@ -59,12 +61,14 @@ export default function LoginPage() {
       } else {
         console.error("Login failed:", error.response.data.message);
         setErrors({ server: "Invalid username or password" });
+        toast.error("Login faliure");
       }
     }
   };
 
   return (
     <ThemeProvider theme={defaultTheme}>
+      <Toaster />
       <Grid container component="main" sx={{ height: "100vh" }}>
         <CssBaseline />
         <Grid

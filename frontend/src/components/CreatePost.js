@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { createPost, fetchPosts } from "../redux/postActions.js";
 import { useNavigate } from "react-router-dom";
+import { Toaster, toast } from "react-hot-toast";
 
 const CreatePost = ({ onClose }) => {
   const [postText, setPostText] = useState("");
@@ -12,7 +13,7 @@ const CreatePost = ({ onClose }) => {
 
   const handleSubmitPost = async () => {
     if (!postText) {
-      alert("Post text is required");
+      toast.error("Post text is required");
       return;
     }
     await dispatch(createPost({ text: postText, img: postImage }));
@@ -24,6 +25,7 @@ const CreatePost = ({ onClose }) => {
 
   return (
     <div className="create-post-form">
+      <Toaster />
       <textarea
         value={postText}
         onChange={(e) => setPostText(e.target.value)}

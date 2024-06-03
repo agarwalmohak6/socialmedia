@@ -12,6 +12,7 @@ import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import * as yup from "yup";
+import { Toaster, toast } from "react-hot-toast";
 
 const defaultTheme = createTheme();
 
@@ -54,7 +55,7 @@ export default function SignUp() {
       );
       if (response.status === 201) {
         console.log("Form submitted:", formData);
-        alert("User Registered Successfully");
+        toast.success("User Registered Successfully");
         setFormData({
           name: "",
           username: "",
@@ -73,12 +74,14 @@ export default function SignUp() {
         setErrors(newErrors);
       } else {
         console.error("Error during form submission:", error);
+        toast.error("Failed to register user");
       }
     }
   };
 
   return (
     <ThemeProvider theme={defaultTheme}>
+      <Toaster/>
       <Grid container component="main" sx={{ height: "100vh" }}>
         <CssBaseline />
         <Grid

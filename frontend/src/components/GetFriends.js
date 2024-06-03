@@ -4,6 +4,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../helper/axiosInstance";
+import { Toaster, toast } from "react-hot-toast";
 
 const GetFriends = () => {
   const [friends, setFriends] = useState([]);
@@ -45,7 +46,7 @@ const GetFriends = () => {
       );
       console.log(res1);
       if (!res1.data) {
-        alert("User not found");
+        toast.error("User not found");
         setAddFriend("");
       } else {
         const response = await axiosInstance.post(
@@ -71,6 +72,7 @@ const GetFriends = () => {
 
   return (
     <div className="friends-list">
+      <Toaster />
       <input
         type="text"
         value={addFriend}
