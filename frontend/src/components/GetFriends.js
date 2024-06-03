@@ -5,12 +5,13 @@ import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../helper/axiosInstance";
 import { Toaster, toast } from "react-hot-toast";
+import { useSelector } from "react-redux";
 
 const GetFriends = () => {
   const [friends, setFriends] = useState([]);
   const [addFriend, setAddFriend] = useState("");
-  const token = localStorage.getItem("token");
-  const curr_name = localStorage.getItem("username");
+  const token = useSelector((state) => state.auth.token);
+  const curr_name = useSelector((state) => state.auth.user);
   const decoded = token ? jwtDecode(token) : {};
 
   const navigate = useNavigate();

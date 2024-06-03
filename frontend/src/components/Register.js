@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -10,14 +10,17 @@ import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import axios from "axios";
 import * as yup from "yup";
 import { Toaster, toast } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { signUpUser } from "../redux/authSlice.js";
 
 const defaultTheme = createTheme();
 
 export default function SignUp() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.auth);
 
   const [formData, setFormData] = React.useState({
     name: "",
@@ -26,7 +29,7 @@ export default function SignUp() {
     password: "",
   });
   const [errors, setErrors] = React.useState({});
-  // Define validation schema using yup
+
   const validationSchema = yup.object().shape({
     name: yup.string().required("Name is required"),
     username: yup.string().required("Username is required"),
@@ -49,22 +52,16 @@ export default function SignUp() {
     event.preventDefault();
     try {
       await validationSchema.validate(formData, { abortEarly: false });
-      const response = await axios.post(
-        "http://localhost:5000/api/users/signup",
-        formData
-      );
-      if (response.status === 201) {
-        console.log("Form submitted:", formData);
-        toast.success("User Registered Successfully");
-        setFormData({
-          name: "",
-          username: "",
-          email: "",
-          password: "",
-        });
-        setErrors({});
-        navigate("/login");
-      }
+      await dispatch(signUpUser(formData)).unwrap();
+      toast.success("User Registered Successfully");
+      setFormData({
+        name: "",
+        username: "",
+        email: "",
+        password: "",
+      });
+      setErrors({});
+      navigate("/login");
     } catch (error) {
       if (error instanceof yup.ValidationError) {
         const newErrors = {};
@@ -81,7 +78,7 @@ export default function SignUp() {
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Toaster/>
+      <Toaster />
       <Grid container component="main" sx={{ height: "100vh" }}>
         <CssBaseline />
         <Grid
@@ -182,6 +179,7 @@ export default function SignUp() {
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
+                disabled={loading}
               >
                 Sign Up
               </Button>

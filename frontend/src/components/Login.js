@@ -10,14 +10,18 @@ import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import axios from "axios";
 import * as yup from "yup";
 import { Toaster, toast } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../redux/authSlice.js";
 
 const defaultTheme = createTheme();
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.auth);
+
   const [formData, setFormData] = React.useState({
     username: "",
     password: "",
@@ -41,16 +45,9 @@ export default function LoginPage() {
     event.preventDefault();
     try {
       await validationSchema.validate(formData, { abortEarly: false });
-      const response = await axios.post(
-        "http://localhost:5000/api/users/login",
-        formData
-      );
-      if (response.status === 200) {
-        toast.success("Logged in successfully");
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("username", response.data.username);
-        navigate("/postsPage");
-      }
+      await dispatch(loginUser(formData)).unwrap();
+      toast.success("Logged in successfully");
+      navigate("/postsPage");
     } catch (error) {
       if (error instanceof yup.ValidationError) {
         const newErrors = {};
@@ -59,9 +56,9 @@ export default function LoginPage() {
         });
         setErrors(newErrors);
       } else {
-        console.error("Login failed:", error.response.data.message);
-        setErrors({ server: "Invalid username or password" });
-        toast.error("Login faliure");
+        console.error("Login failed:", error);
+        setErrors({ server: error });
+        toast.error("Login failure");
       }
     }
   };
@@ -147,6 +144,7 @@ export default function LoginPage() {
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
+                disabled={loading}
               >
                 Sign In
               </Button>

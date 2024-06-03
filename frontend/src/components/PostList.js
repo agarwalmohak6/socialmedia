@@ -11,7 +11,7 @@ import {
 const PostList = ({ fetchPosts }) => {
   const [showComments, setShowComments] = useState(null);
   const [commentInputs, setCommentInputs] = useState({});
-  const token = localStorage.getItem("token");
+  const token = useSelector((state) => state.auth.token);
   const decoded = token ? jwtDecode(token) : {};
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.posts.posts);
