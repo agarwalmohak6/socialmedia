@@ -1,6 +1,7 @@
 import { Post } from "../models/Post.model.js";
 import { validatePost } from "../models/Post.model.js";
 import { Reply } from "../models/Reply.model.js";
+import { User } from "../models/User.model.js";
 import { validateReply } from "../models/Reply.model.js";
 import StatusCodes from "../utils/statusCodes.js";
 import checkPostExist from "../utils/helpers/checkPostExist.js";
@@ -9,12 +10,19 @@ const createPost = async (req, res) => {
   try {
     await validatePost(req.body);
     const { text, img } = req.body;
-    const postedBy = req.user._id.toString();
-    const newPost = new Post({ postedBy, text, img });
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: "User not found" });
+    }
+    const { username } = user;
+    const newPost = new Post({ postedBy: userId, text, img, username });
     await newPost.save();
     return res
       .status(StatusCodes.CREATED)
-      .json({ message: "Post created successfully" });
+      .json({ message: "Post created successfully", post: newPost });
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
     console.log("Error in createPost", error.message);
@@ -106,15 +114,31 @@ const replyToPost = async (req, res) => {
     // Validating the reply data
     await validateReply(req.body);
 
+    // Fetch the post to ensure it exists
     const post = await Post.findById(postId);
-    checkPostExist(post, res);
+    if (!post) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: "Post not found" });
+    }
 
-    const reply = new Reply({ postId, userId, text });
+    // Fetch the user's username
+    const user = await User.findById(userId);
+    if (!user) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: "User not found" });
+    }
+
+    const { username } = user;
+
+    // Create a new reply with the username included
+    const reply = new Reply({ postId, userId, text, username });
     await reply.save();
 
     res
       .status(StatusCodes.CREATED)
-      .json({ message: "Reply added successfully", post });
+      .json({ message: "Reply added successfully", reply });
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
     console.log("Error in replyToPost", error.message);

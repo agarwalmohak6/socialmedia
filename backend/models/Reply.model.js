@@ -3,15 +3,19 @@ import * as Yup from "yup";
 
 const replySchema = mongoose.Schema(
   {
-    postId:{
-      type:mongoose.Schema.Types.ObjectId,
-      ref:"Post"
+    postId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Post",
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
     text: {
+      type: String,
+      required: true,
+    },
+    username: {
       type: String,
       required: true,
     },

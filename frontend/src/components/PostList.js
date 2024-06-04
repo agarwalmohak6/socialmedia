@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import {
   handleLike,
   fetchComments,
@@ -72,13 +72,16 @@ const PostList = ({ fetchPosts }) => {
       <div className="post-container">
         {posts.map((post) => (
           <div key={post._id} className="post">
-            {post.img && <img src={post.img} alt="Post" className="post-image" />}
+            {post.img && (
+              <img src={post.img} alt="Post" className="post-image" />
+            )}
             <div className="post-content">
               <p className="post-text">{post.text}</p>
               <div className="post-details">
                 <p className="post-created-at">
                   Created At: {new Date(post.createdAt).toLocaleString()}
                 </p>
+                <p className="post-created-at">Created By: {post.username}</p>
                 <div className="post-actions">
                   {isPostLikedByUser(post) ? (
                     <button
@@ -99,7 +102,9 @@ const PostList = ({ fetchPosts }) => {
                     className="comment-button"
                     onClick={() => handleShowComments(post._id)}
                   >
-                    {showComments === post._id ? "Hide Comments" : "Show Comments"}
+                    {showComments === post._id
+                      ? "Hide Comments"
+                      : "Show Comments"}
                   </button>
                 </div>
                 <div className="post-stats">
@@ -115,10 +120,13 @@ const PostList = ({ fetchPosts }) => {
       </div>
       {showComments && (
         <div className="comments-side-panel">
-          <h2>Comments</h2>
+          <h2>
+            <u>Comments</u>
+          </h2>
           {comments[showComments]?.map((comment, index) => (
             <div key={index} className="comment">
-              <p>{comment.text}</p>
+              <h3>{comment.text}</h3>
+              <p>By-{comment.username}</p>
             </div>
           ))}
           <div className="add-comment-section">
@@ -137,10 +145,7 @@ const PostList = ({ fetchPosts }) => {
               Add Comment
             </button>
           </div>
-          <button
-            className="close-popup"
-            onClick={() => setShowComments(null)}
-          >
+          <button className="close-popup" onClick={() => setShowComments(null)}>
             Close
           </button>
         </div>

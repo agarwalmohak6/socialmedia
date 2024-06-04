@@ -21,14 +21,20 @@ const postSchema = mongoose.Schema(
     img: {
       type: String,
     },
+    username: {
+      type: String,
+      required: true,
+    },
     likes: {
       type: [],
       default: [],
     },
-    replies: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Reply"
-    }]
+    replies: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Reply",
+      },
+    ],
   },
   { timestamps: true }
 );
