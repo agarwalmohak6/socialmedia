@@ -12,8 +12,8 @@ const GetFriends = () => {
   const [addFriend, setAddFriend] = useState("");
   // const token = useSelector((state) => state.auth.token);
   // const curr_name = useSelector((state) => state.auth.user);
-  const token= localStorage.getItem("token");
-  const curr_name= localStorage.getItem("username")
+  const token = localStorage.getItem("token");
+  const curr_name = localStorage.getItem("username");
   const decoded = token ? jwtDecode(token) : {};
 
   const navigate = useNavigate();
@@ -57,6 +57,7 @@ const GetFriends = () => {
         );
         console.log(response);
         if (response.status === 200) {
+          toast.success("Added a friend")
           setFriends((prevFriends) => [
             ...prevFriends,
             {
@@ -70,6 +71,30 @@ const GetFriends = () => {
       }
     } catch (error) {
       console.log("Error in adding friend ", error);
+    }
+  };
+  const handleRemoveFriend = async (username) => {
+    try {
+      const res1 = await axios.get(
+        `http://localhost:5000/api/users/profile/${username}`
+      );
+      const response = await axiosInstance.post(
+        `/users/unfollow/${res1.data._id}`
+      );
+      console.log(response);
+      if (response.status === 200) {
+        toast.success("Removed a friend")
+        setFriends((prevFriends) => [
+          prevFriends,
+          {
+            id: res1.data._id,
+            name: res1.data.name,
+            username: res1.data.username,
+          },
+        ]);
+      }
+    } catch (error) {
+      console.log("Error in removing friend ", error);
     }
   };
 
@@ -94,7 +119,7 @@ const GetFriends = () => {
               <span className="friend-username">@{friend.username}</span>
             </div>
             <div>
-              <button onClick={() => handleAddFriend(friend.username)}>
+              <button onClick={() => handleRemoveFriend(friend.username)}>
                 Remove Friend
               </button>
               <button onClick={() => handleChatFriend(friend.username)}>

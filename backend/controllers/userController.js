@@ -1,7 +1,6 @@
 import { User } from "../models/User.model.js";
 import { validateUser } from "../models/User.model.js";
 import { Friend } from "../models/Friend.model.js";
-import { validateFriend } from "../models/Friend.model.js";
 import bcrypt from "bcryptjs";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAndSetCookie.js";
 import StatusCodes from "../utils/statusCodes.js";
@@ -88,10 +87,10 @@ const logoutUser = async (req, res) => {
   }
 };
 
-const followUnfollowUser = async (req, res) => {
+const followUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const currentUser = req.user._id; // Assuming req.user is set via middleware
+    const currentUser = req.user._id;
 
     const userToModify = await User.findById(id);
     if (!userToModify) {
@@ -100,7 +99,45 @@ const followUnfollowUser = async (req, res) => {
     if (userToModify._id.equals(currentUser)) {
       return res
         .status(400)
-        .json({ message: "You can't follow/unfollow yourself" });
+        .json({ message: "You can't follow yourself" });
+    }
+
+    const existingFriendship = await Friend.findOne({
+      followRequestBy: currentUser,
+      followRequestTo: userToModify._id,
+    });
+
+    if (!existingFriendship) {
+      const newFriendship = new Friend({
+        followRequestBy: currentUser,
+        followRequestTo: userToModify._id,
+      });
+      await newFriendship.save();
+      res.status(200).json({ message: "User followed successfully" });
+    } else {
+      return res
+        .status(400)
+        .json({ message: "You already follow this user" });
+    }
+  } catch (error) {
+    console.log("Error while following user:", error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const unfollowUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const currentUser = req.user._id;
+
+    const userToModify = await User.findById(id);
+    if (!userToModify) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (userToModify._id.equals(currentUser)) {
+      return res
+        .status(400)
+        .json({ message: "You can't unfollow yourself" });
     }
 
     const existingFriendship = await Friend.findOne({
@@ -112,18 +149,14 @@ const followUnfollowUser = async (req, res) => {
       await Friend.deleteOne({ _id: existingFriendship._id });
       res.status(200).json({ message: "User unfollowed successfully" });
     } else {
-      const newFriendship = new Friend({
-        followRequestBy: currentUser,
-        followRequestTo: userToModify._id,
-      });
-      await newFriendship.save();
-      res.status(200).json({ message: "User followed successfully" });
+      return res.json({ message: "You don't follow this user" });
     }
   } catch (error) {
-    console.log("Error while following/unfollowing user:", error.message);
+    console.log("Error while unfollowing user:", error.message);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 const updateUser = async (req, res) => {
   const { name, username, email, password, profilePic, bio } = req.body;
@@ -200,7 +233,8 @@ export {
   signUpUser,
   loginUser,
   logoutUser,
-  followUnfollowUser,
+  followUser,
+  unfollowUser,
   updateUser,
   getUserProfile,
   getFriends,

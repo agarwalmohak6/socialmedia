@@ -3,7 +3,8 @@ import {
   loginUser,
   signUpUser,
   logoutUser,
-  followUnfollowUser,
+  followUser,
+  unfollowUser,
   updateUser,
   getUserProfile,
   getFriends,
@@ -15,7 +16,8 @@ router.get("/profile/:username", getUserProfile);
 router.post("/signup", signUpUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
-router.post("/follow/:id", protectRoute, followUnfollowUser);
+router.post("/follow/:id", protectRoute, followUser);
+router.post("/unfollow/:id",protectRoute,unfollowUser);
 router.post("/update/:id", protectRoute, updateUser);
 router.get("/friends/:id", getFriends);
 
