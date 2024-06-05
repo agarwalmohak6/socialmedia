@@ -1,17 +1,13 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../helper/axiosInstance";
 import { Toaster, toast } from "react-hot-toast";
-// import { useSelector } from "react-redux";
 
 const GetFriends = () => {
   const [friends, setFriends] = useState([]);
   const [addFriend, setAddFriend] = useState("");
-  // const token = useSelector((state) => state.auth.token);
-  // const curr_name = useSelector((state) => state.auth.user);
   const token = localStorage.getItem("token");
   const curr_name = localStorage.getItem("username");
   const decoded = token ? jwtDecode(token) : {};
@@ -30,7 +26,7 @@ const GetFriends = () => {
       }
     };
     fetchFriends();
-  }, [decoded]);
+  }, [decoded.userId]);
 
   const handleChatFriend = async (friendUsername) => {
     try {
@@ -57,7 +53,7 @@ const GetFriends = () => {
         );
         console.log(response);
         if (response.status === 200) {
-          toast.success("Added a friend")
+          toast.success("Added a friend");
           setFriends((prevFriends) => [
             ...prevFriends,
             {
@@ -66,10 +62,14 @@ const GetFriends = () => {
               username: res1.data.username,
             },
           ]);
-          setAddFriend("");
         }
+        setAddFriend("");
       }
     } catch (error) {
+      if (error.response && error.response.status === 409)
+        toast.error("You already follow this user");
+      else if (error.response && error.response.status === 400)
+        toast.error("You can't add yourself as a friend");
       console.log("Error in adding friend ", error);
     }
   };
@@ -83,7 +83,7 @@ const GetFriends = () => {
       );
       console.log(response);
       if (response.status === 200) {
-        toast.success("Removed a friend")
+        toast.success("Removed a friend");
         setFriends((prevFriends) => [
           prevFriends,
           {
