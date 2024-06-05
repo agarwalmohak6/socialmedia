@@ -23,7 +23,6 @@ const postSchema = mongoose.Schema(
     },
     username: {
       type: String,
-      required: true,
     },
     likes: {
       type: [],

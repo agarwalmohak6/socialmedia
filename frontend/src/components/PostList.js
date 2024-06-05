@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
+import moment from "moment";
 import {
   handleLike,
   fetchComments,
@@ -11,7 +12,7 @@ import {
 const PostList = ({ fetchPosts }) => {
   const [showComments, setShowComments] = useState(null);
   const [commentInputs, setCommentInputs] = useState({});
-  const token = useSelector((state) => state.auth.token);
+  const token = localStorage.getItem("token");
   const decoded = token ? jwtDecode(token) : {};
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.posts.posts);
@@ -79,7 +80,7 @@ const PostList = ({ fetchPosts }) => {
               <p className="post-text">{post.text}</p>
               <div className="post-details">
                 <p className="post-created-at">
-                  Created At: {new Date(post.createdAt).toLocaleString()}
+                  Created At: {moment(post.createdAt).fromNow()}
                 </p>
                 <p className="post-created-at">Created By: {post.username}</p>
                 <div className="post-actions">
@@ -126,7 +127,8 @@ const PostList = ({ fetchPosts }) => {
           {comments[showComments]?.map((comment, index) => (
             <div key={index} className="comment">
               <h3>{comment.text}</h3>
-              <p>By-{comment.username}</p>
+              <h4>By-{comment.username}</h4>
+              <h5>Created At: {moment(comment.createdAt).fromNow()}</h5>
             </div>
           ))}
           <div className="add-comment-section">
