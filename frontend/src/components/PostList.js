@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import moment from "moment";
+import { ImCancelCircle } from "react-icons/im";
 import {
   handleLike,
   fetchComments,
@@ -80,7 +81,7 @@ const PostList = ({ fetchPosts }) => {
               <p className="post-text">{post.text}</p>
               <div className="post-details">
                 <p className="post-created-at">
-                  Created At: {moment(post.createdAt).fromNow()}
+                  Created: {moment(post.createdAt).fromNow()}
                 </p>
                 <p className="post-created-at">Created By: {post.username}</p>
                 <div className="post-actions">
@@ -121,6 +122,9 @@ const PostList = ({ fetchPosts }) => {
       </div>
       {showComments && (
         <div className="comments-side-panel">
+          <div className="close-popup">
+            <ImCancelCircle onClick={() => setShowComments(null)} />
+          </div>
           <h2>
             <u>Comments</u>
           </h2>
@@ -128,7 +132,7 @@ const PostList = ({ fetchPosts }) => {
             <div key={index} className="comment">
               <h3>{comment.text}</h3>
               <h4>By-{comment.username}</h4>
-              <h5>Created At: {moment(comment.createdAt).fromNow()}</h5>
+              <h5>Created: {moment(comment.createdAt).fromNow()}</h5>
             </div>
           ))}
           <div className="add-comment-section">
@@ -147,9 +151,6 @@ const PostList = ({ fetchPosts }) => {
               Add Comment
             </button>
           </div>
-          <button className="close-popup" onClick={() => setShowComments(null)}>
-            Close
-          </button>
         </div>
       )}
     </div>

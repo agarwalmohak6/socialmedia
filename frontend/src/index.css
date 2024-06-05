@@ -268,7 +268,6 @@ a {
   align-items: center;
   margin-top: 5px;
 }
-
 .comments-side-panel {
   position: fixed;
   top: 0;
@@ -288,18 +287,20 @@ a {
 }
 
 .close-popup {
-  background-color: #ff4500;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 10px 20px;
-  cursor: pointer;
-  margin-top: 10px;
-  transition: background-color 0.3s;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
 }
 
-.close-popup:hover {
-  background-color: #e63900;
+.close-popup svg {
+  cursor: pointer;
+  font-size: 1.5em; /* Adjust the size of the icon here */
+  color: #ff4500;
+  transition: color 0.3s;
+}
+
+.close-popup svg:hover {
+  color: #e63900;
 }
 
 .add-comment-section {
@@ -328,6 +329,7 @@ a {
 .add-comment-section button:hover {
   background-color: #0056b3;
 }
+
 
 /* Get Friends CSS */
 .friends-list {
